@@ -4,8 +4,15 @@ import androidx.navigation3.runtime.NavKey
 import kotlinx.serialization.Serializable
 
 sealed interface AppScreen : NavKey {
+
+    @Serializable
+    data object SplashScreen : AppScreen
     @Serializable
     data object LoginScreen : AppScreen
     @Serializable
     data object RegisterScreen : AppScreen
+
+    @Serializable
+    data object HomeScreen : AppScreen
+
 }

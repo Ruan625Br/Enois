@@ -6,6 +6,7 @@ val appModules = module {
     includes(
         networkModule,
         repositoryModule,
+        sessionModule,
         useCaseModule,
         presentationModule
     )

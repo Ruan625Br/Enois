@@ -1,20 +1,23 @@
 package dev.jn.enois.data.repository
 
+import dev.jn.enois.data.local.session.TokenStorage
+import dev.jn.enois.data.mapper.toDomain
 import dev.jn.enois.data.remote.api.AuthApi
 import dev.jn.enois.data.remote.dto.auth.LoginRequest
 import dev.jn.enois.data.remote.dto.auth.RegisterRequest
-import dev.jn.enois.data.remote.mapper.toDomain
 import dev.jn.enois.domain.model.AuthSession
 import dev.jn.enois.domain.repository.AuthRepository
+import dev.jn.enois.domain.repository.SessionRepository
 
 class AuthRepositoryImpl(
-    private val authApi: AuthApi
-): AuthRepository {
+    private val authApi: AuthApi,
+    private val sessionRepository: SessionRepository
+) : AuthRepository {
 
     override suspend fun login(
         email: String,
         password: String
-    ): Result<AuthSession> = runCatching{
+    ): Result<AuthSession> = runCatching {
         val response = authApi.login(
             LoginRequest(
                 email = email,
@@ -22,14 +25,9 @@ class AuthRepositoryImpl(
             )
         )
 
-        val session = AuthSession(
-            user = response.user.toDomain(),
-            accessToken = response.token,
-            refreshToken = response.refreshToken,
-            expiresIn = 0L //TODO: Implementar
-        )
+        val session = response.toDomain()
 
-        //TODO: Salvar a sessão no data store
+        sessionRepository.updateSession(session)
 
         session
     }
@@ -48,14 +46,9 @@ class AuthRepositoryImpl(
             )
         )
 
-        val session = AuthSession(
-            user = response.user.toDomain(),
-            accessToken = response.token,
-            refreshToken = response.refreshToken,
-            expiresIn = 0L //TODO: Implementar
-        )
+        val session = response.toDomain()
 
-        //TODO: Salvar a sessão no data store
+        sessionRepository.updateSession(session)
 
         session
 
@@ -66,7 +59,9 @@ class AuthRepositoryImpl(
     }
 
     override suspend fun logout(): Result<Unit> {
-        TODO("Not yet implemented")
+        sessionRepository.logout()
+
+        return Result.success(Unit)
     }
 
     override suspend fun forgotPassword(email: String): Result<Unit> {
