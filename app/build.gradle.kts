@@ -55,6 +55,7 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.tooling)
 
 
+    implementation(libs.androidx.material3.adaptive.navigation3)
     implementation(libs.kotlinx.serialization.json)
 
     //Koin

@@ -1,0 +1,11 @@
+package dev.jn.enois.app.navigation
+
+import androidx.navigation3.runtime.NavKey
+import kotlinx.serialization.Serializable
+
+sealed interface AppScreen : NavKey {
+    @Serializable
+    data object LoginScreen : AppScreen
+    @Serializable
+    data object RegisterScreen : AppScreen
+}
