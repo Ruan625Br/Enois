@@ -15,10 +15,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import dev.jn.enois.domain.model.UserProfile
 import dev.jn.enois.ui.icons.AppIcons
 
 @Composable
-fun FeedToolbar(modifier: Modifier = Modifier) {
+fun FeedToolbar(
+    userProfile: UserProfile?,
+    modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
     ) {
@@ -38,7 +41,9 @@ fun FeedToolbar(modifier: Modifier = Modifier) {
 
             Spacer(Modifier.weight(1f))
 
-            FeedToolbarActions()
+            FeedToolbarActions(
+                userProfile = userProfile
+            )
         }
 
 

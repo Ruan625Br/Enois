@@ -44,10 +44,11 @@ private fun PostHeader(
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
         UserAvatar(
-            url = post.authorAvatar ?: ""
+            url = post.authorAvatar ?: "",
+            userName = post.authorName
         )
         Text(
-            text = post.authorUsername
+            text = post.authorName
         )
     }
 }

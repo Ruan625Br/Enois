@@ -1,12 +1,22 @@
 package dev.jn.enois.presentation.feed.components
 
-import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
@@ -15,7 +25,10 @@ import coil3.request.ImageRequest
 @Composable
 fun UserAvatar(
     url: String,
-    modifier: Modifier = Modifier
+    userName: String,
+    modifier: Modifier = Modifier,
+    textStyle: TextStyle = MaterialTheme.typography.titleLarge,
+    shape: Shape = MaterialTheme.shapes.medium
 ) {
 
     val context = LocalPlatformContext.current
@@ -29,21 +42,84 @@ fun UserAvatar(
             .data(urlResolved)
             .build()
     }
+    var loadFallback by rememberSaveable { mutableStateOf(false) }
+    var isLoading by rememberSaveable { mutableStateOf(true) }
 
-    AsyncImage(
-        model = model,
-        contentDescription = null,
-        modifier = modifier
+    Box(
+        modifier
             .size(50.dp)
-            .clip(MaterialTheme.shapes.medium),
-        onError = { state ->
-            Log.e(
-                "UserAvatar",
-                "Falha ao carregar $urlResolved - $url",
-                state.result.throwable
+            .clip(shape)
+    ) {
+        if (isLoading) {
+            UserAvatarFallback(
+                userName = userName,
+                style = textStyle,
             )
         }
-    )
+        if (loadFallback) {
+            UserAvatarFallback(
+                userName = userName,
+                style = textStyle,
+            )
+        } else {
+            AsyncImage(
+                model = model,
+                contentDescription = null,
+                modifier = Modifier
+                    .fillMaxSize(),
+                onLoading = {
+                    isLoading = true
+                },
+                onSuccess = {
+                    isLoading = false
+                },
+                onError = {
+                    isLoading = false
+                    loadFallback = true
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun UserAvatarFallback(
+    userName: String,
+    modifier: Modifier = Modifier,
+    style: TextStyle = MaterialTheme.typography.titleLarge,
+) {
+
+    val initials = remember(userName) {
+        getUserNameInitials(userName)
+    }
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                MaterialTheme.colorScheme.primaryContainer
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = initials,
+            style = style,
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        )
+    }
+}
+
+private fun getUserNameInitials(name: String): String {
+    val parts = name.trim().split(Regex("\\s+"))
+        .filter { it.isNotEmpty() }
+
+    if (parts.isEmpty()) return ""
+    if (parts.size == 1) return parts[0].first().uppercase()
+
+    val first = parts.first().first()
+    val last = parts.last().first()
+
+    return "$first$last".uppercase()
 }
 
 private fun resolveCdnUrl(url: String): String {

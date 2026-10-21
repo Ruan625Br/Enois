@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -25,20 +26,23 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import dev.jn.enois.domain.model.UserProfile
 import dev.jn.enois.ui.icons.AppIcons
 
 @Composable
-fun FeedToolbarActions(modifier: Modifier = Modifier) {
+fun FeedToolbarActions(
+    userProfile: UserProfile?,
+    modifier: Modifier = Modifier
+) {
     val buttonShape = RoundedCornerShape(50)
     val border = BorderStroke(
         1.dp,
         MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
     )
     val topPillSize = 48.dp
-    val fullPillWidth = topPillSize * 2f
-    val targetWidth = fullPillWidth
+    val fullPillWidth = topPillSize * 3f
     val pillWidth by animateDpAsState(
-        targetValue = targetWidth,
+        targetValue = fullPillWidth,
         animationSpec = spring(
             dampingRatio = 0.6f,
             stiffness = 300f
@@ -81,8 +85,64 @@ fun FeedToolbarActions(modifier: Modifier = Modifier) {
                     size = topPillSize,
                     onClick = {}
                 )
+
+                if (userProfile != null) {
+                    UserProfileIcon(
+                        url = userProfile.avatar ?: "",
+                        size = topPillSize,
+                        name = userProfile.name,
+                        onClick = {}
+                    )
+                }
             }
         }
+    }
+}
+
+@Composable
+private fun UserProfileIcon(
+    url: String,
+    size: Dp,
+    name: String,
+    onClick: () -> Unit
+) {
+
+    val interactionSource = remember { MutableInteractionSource() }
+    val isPressed by interactionSource.collectIsPressedAsState()
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.85f else 1f,
+        animationSpec = spring(
+            dampingRatio = 0.6f,
+            stiffness = 300f
+        ),
+        label = "feed_toolbar_icon_scale"
+    )
+
+    Box(
+        modifier = Modifier
+            .size(size)
+            .graphicsLayer {
+                scaleX = scale
+                scaleY = scale
+            }
+            .clip(CircleShape)
+            .clickable(
+                interactionSource = interactionSource,
+                indication = null,
+                onClick = {
+                    onClick()
+                }
+            ),
+        contentAlignment = Alignment.Center
+    ) {
+        UserAvatar(
+            url = url,
+            userName = name,
+            textStyle = MaterialTheme.typography.labelMedium,
+            shape = CircleShape,
+            modifier = Modifier
+                .size(size * 0.75f)
+        )
     }
 }
 

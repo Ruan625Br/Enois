@@ -1,13 +1,11 @@
 package dev.jn.enois.presentation.feed
 
-import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.domain.model.FeedTab
+import dev.jn.enois.domain.model.UserProfile
 
 data class FeedUiState(
-    val posts: List<FeedPost> = emptyList(),
+    val userProfile: UserProfile? = null,
     val selectedTab: FeedTab = FeedTab.ALL,
-    val nextCursor: String? = null,
     val isLoading: Boolean = false,
-    val isLoadingMore: Boolean = false,
     val error: String? = null
 )

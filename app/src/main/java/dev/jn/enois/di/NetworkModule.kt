@@ -2,6 +2,7 @@ package dev.jn.enois.di
 
 import dev.jn.enois.data.remote.api.AuthApi
 import dev.jn.enois.data.remote.api.FeedApi
+import dev.jn.enois.data.remote.api.UserProfileApi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.android.Android
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -41,4 +42,5 @@ val networkModule = module {
 
     singleOf(::AuthApi)
     singleOf(::FeedApi)
+    singleOf(::UserProfileApi)
 }

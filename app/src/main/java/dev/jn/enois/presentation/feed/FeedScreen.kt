@@ -86,7 +86,9 @@ private fun FeedScreen(
                 enter = slideInVertically { -it } + fadeIn(),
                 exit = slideOutVertically { -it } + fadeOut()
             ) {
-                FeedToolbar()
+                FeedToolbar(
+                    userProfile = uiState.userProfile
+                )
             }
         },
     ) { innerPadding ->
