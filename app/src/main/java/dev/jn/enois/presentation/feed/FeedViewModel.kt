@@ -47,29 +47,4 @@ class FeedViewModel(
         }
     }
 
-    private fun loadFeed() = viewModelScope.launch {
-        _uiState.update {
-            it.copy(isLoading = true, error = null)
-        }
-
-        val result = feedRepository.getFeed(
-            tab = FeedTab.ALL,
-        )
-        result.onSuccess { page ->
-            _uiState.update {
-                it.copy(
-                    posts = page.posts,
-                    nextCursor = page.nextCursor,
-                    isLoading = false
-                )
-            }
-        }.onFailure { error ->
-            _uiState.update {
-                it.copy(
-                    isLoading = false,
-                    error = error.message ?: "Não foi possível carregar o feed"
-                )
-            }
-        }
-    }
 }

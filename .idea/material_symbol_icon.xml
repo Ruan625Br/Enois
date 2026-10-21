@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="MaterialSymbolIconSettings">
+    <option name="appIconsFilePath" value="$PROJECT_DIR$/app/src/main/java/dev/jn/enois/ui/icons/AppIcons.kt" />
+    <option name="composeDestinationPath" value="C:\Users\juann\EnoisProject\EnoisApp\app\src\main\java\dev\jn\enois\ui\icons" />
+    <option name="composePackageName" value="dev.jn.enois.ui.icons" />
+    <option name="drawableDestinationPath" value="$PROJECT_DIR$/app/src/main/res/drawable" />
+  </component>
+</project>

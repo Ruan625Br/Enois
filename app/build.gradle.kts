@@ -73,5 +73,8 @@ dependencies {
     //Paging
     implementation(libs.paging.runtime)
     implementation(libs.paging.compose)
+
+    implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }
 
