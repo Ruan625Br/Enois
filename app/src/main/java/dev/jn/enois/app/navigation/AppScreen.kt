@@ -13,6 +13,6 @@ sealed interface AppScreen : NavKey {
     data object RegisterScreen : AppScreen
 
     @Serializable
-    data object HomeScreen : AppScreen
+    data object FeedScreen : AppScreen
 
 }

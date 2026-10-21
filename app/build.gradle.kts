@@ -70,5 +70,8 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.client.logging)
 
+    //Paging
+    implementation(libs.paging.runtime)
+    implementation(libs.paging.compose)
 }
 
