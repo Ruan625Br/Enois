@@ -22,6 +22,7 @@ fun FeedPostDto.toDomain() = FeedPost(
     authorUsername = authorUsername,
     authorName = authorName,
     authorBadge = authorBadge,
+    authorBadges = authorBadges,
     authorAvatar = authorAvatar,
     authorAvatarFrame = authorAvatarFrame,
     authorIdentity = authorIdentity,

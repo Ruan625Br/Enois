@@ -1,5 +1,7 @@
 package dev.jn.enois.presentation.feed.components
 
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -15,7 +17,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.jn.enois.domain.model.UserProfile
+import dev.jn.enois.ui.animation.LocalSharedTransitionScope
 import dev.jn.enois.ui.icons.AppIcons
 
 @Composable
@@ -24,6 +28,10 @@ fun FeedToolbar(
     modifier: Modifier = Modifier) {
     Box(
         modifier = modifier
+            .toolbarSharedBounds(
+                sharedTransitionScope = LocalSharedTransitionScope.current,
+                animatedVisibilityScope = LocalNavAnimatedContentScope.current
+            )
     ) {
         FeedTopFadeOverlay(
             modifier = Modifier
@@ -75,5 +83,18 @@ private fun FeedToolbarDrawerButton(modifier: Modifier = Modifier) {
 }
 
 
+@Composable
+fun Modifier.toolbarSharedBounds(
+    sharedTransitionScope: SharedTransitionScope,
+    animatedVisibilityScope: AnimatedVisibilityScope,
+): Modifier = with(sharedTransitionScope) {
+    this@toolbarSharedBounds.sharedBounds(
+        sharedContentState = rememberSharedContentState(
+            key = "toolbar"
+        ),
+        animatedVisibilityScope = animatedVisibilityScope,
+        resizeMode = SharedTransitionScope.ResizeMode.scaleToBounds()
+    )
+}
 
 

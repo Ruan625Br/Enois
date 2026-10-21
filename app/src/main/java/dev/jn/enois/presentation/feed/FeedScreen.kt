@@ -1,16 +1,11 @@
 package dev.jn.enois.presentation.feed
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -20,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -32,6 +26,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun FeedRoute(
+    onNavigateToPostDetails: (String) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FeedViewModel = koinViewModel(),
 ) {
@@ -42,6 +37,10 @@ fun FeedRoute(
     FeedScreen(
         uiState = uiState.value,
         posts = posts,
+        onNavigateToPostDetails = { post ->
+            viewModel.addPostToCache(post)
+            onNavigateToPostDetails(post.id)
+        },
         modifier = modifier
     )
 }
@@ -50,6 +49,7 @@ fun FeedRoute(
 private fun FeedScreen(
     uiState: FeedUiState,
     posts: LazyPagingItems<FeedPost>,
+    onNavigateToPostDetails: (FeedPost) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -97,6 +97,7 @@ private fun FeedScreen(
             posts = posts,
             listState = listState,
             innerPadding = innerPadding,
+            onNavigateToPostDetails = onNavigateToPostDetails,
             modifier = modifier
         )
     }

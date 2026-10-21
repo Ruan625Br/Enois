@@ -27,6 +27,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.jn.enois.domain.model.UserProfile
+import dev.jn.enois.ui.components.UserAvatar
 import dev.jn.enois.ui.icons.AppIcons
 
 @Composable

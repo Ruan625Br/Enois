@@ -15,4 +15,7 @@ sealed interface AppScreen : NavKey {
     @Serializable
     data object FeedScreen : AppScreen
 
+    @Serializable
+    data class PostDetailsScreen(val postId: String) : AppScreen
+
 }

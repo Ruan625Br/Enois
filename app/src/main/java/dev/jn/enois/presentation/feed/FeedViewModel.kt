@@ -6,9 +6,11 @@ import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.cachedIn
 import dev.jn.enois.data.pading.FeedPagingSource
+import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.domain.model.FeedTab
 import dev.jn.enois.domain.repository.FeedRepository
 import dev.jn.enois.domain.repository.UserProfileRepository
+import dev.jn.enois.presentation.postdetails.PostDetailsCache
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,7 +22,8 @@ import kotlinx.coroutines.launch
 
 class FeedViewModel(
     private val feedRepository: FeedRepository,
-    private val userProfileRepository: UserProfileRepository
+    private val userProfileRepository: UserProfileRepository,
+    private val postDetailsCache: PostDetailsCache
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedUiState())
@@ -35,7 +38,7 @@ class FeedViewModel(
                 config = PagingConfig(
                     pageSize = 20,
                     initialLoadSize = 20,
-                    prefetchDistance = 5,
+                    prefetchDistance = 8,
                     enablePlaceholders = false
                 ),
                 pagingSourceFactory = {
@@ -65,6 +68,10 @@ class FeedViewModel(
                 it.copy(userProfile = userProfile)
             }
         }
+    }
+
+    fun addPostToCache(post: FeedPost) {
+        postDetailsCache.put(post)
     }
 
 }

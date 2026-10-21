@@ -4,6 +4,7 @@ import dev.jn.enois.data.local.session.TokenStorage
 import dev.jn.enois.data.mapper.toDomain
 import dev.jn.enois.data.remote.api.FeedApi
 import dev.jn.enois.domain.model.FeedPage
+import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.domain.model.FeedTab
 import dev.jn.enois.domain.model.SessionState
 import dev.jn.enois.domain.repository.FeedRepository
@@ -29,6 +30,24 @@ class FeedRepositoryImpl(
                 tab = tab.name,
                 cursor = cursor,
                 limit = limit
+            )
+
+            Result.success(response.toDomain())
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun getPost(postId: String): Result<FeedPost> {
+        return try {
+            val tokens = tokenStorage.getTokens()
+                ?: error("No authenticated session")
+
+            val response = feedApi.getPost(
+                token = tokens.accessToken,
+                postId = postId
             )
 
             Result.success(response.toDomain())

@@ -1,4 +1,4 @@
-package dev.jn.enois.presentation.feed.components
+package dev.jn.enois.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -47,7 +47,7 @@ fun UserAvatar(
 
     Box(
         modifier
-            .size(50.dp)
+            .size(45.dp)
             .clip(shape)
     ) {
         if (isLoading) {
@@ -122,7 +122,7 @@ private fun getUserNameInitials(name: String): String {
     return "$first$last".uppercase()
 }
 
-private fun resolveCdnUrl(url: String): String {
+fun resolveCdnUrl(url: String): String {
     val cleaned = url.replace("%2F", "/")
 
     if (cleaned.startsWith("http://") ||

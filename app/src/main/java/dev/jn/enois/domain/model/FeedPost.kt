@@ -1,13 +1,15 @@
-
 package dev.jn.enois.domain.model
 
+import androidx.compose.runtime.Stable
 
+@Stable
 data class FeedPost(
     val id: String,
     val authorId: String,
     val authorUsername: String,
     val authorName: String,
     val authorBadge: String?,
+    val authorBadges: List<String>?,
     val authorAvatar: String?,
     val authorAvatarFrame: String?,
     val authorIdentity: AuthorIdentity?,
@@ -26,7 +28,13 @@ data class FeedPost(
     val community: PostCommunity?,
     val editedAt: String?,
     val expiredAt: String?,
-)
+) {
+    fun getBadges(): List<String> {
+        val badges = authorBadges?.toMutableList() ?: mutableListOf()
+        authorBadge?.let { badges.add(it) }
+        return badges
+    }
+}
 
 enum class AuthorIdentity {
     SOCIAL,

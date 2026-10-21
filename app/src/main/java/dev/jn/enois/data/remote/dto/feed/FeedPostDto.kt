@@ -13,6 +13,7 @@ data class FeedPostDto(
     val authorUsername: String,
     val authorName: String,
     val authorBadge: String?,
+    val authorBadges: List<String>?,
     val authorAvatar: String?,
     val authorAvatarFrame: String?,
     val authorIdentity: AuthorIdentity?,

@@ -1,6 +1,7 @@
 package dev.jn.enois.domain.repository
 
 import dev.jn.enois.domain.model.FeedPage
+import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.domain.model.FeedTab
 
 interface FeedRepository {
@@ -11,4 +12,7 @@ interface FeedRepository {
         limit: Int = 20
     ): Result<FeedPage>
 
+    suspend fun getPost(
+        postId: String,
+    ): Result<FeedPost>
 }
