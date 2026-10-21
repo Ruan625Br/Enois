@@ -142,7 +142,7 @@ private fun PostHeader(
                     .weight(1f)
             )
             Text(
-                text = "· ${formatTime(post.createdAt)}",
+                text = "· $formattedTime",
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
