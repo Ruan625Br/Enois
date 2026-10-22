@@ -11,6 +11,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -28,10 +29,11 @@ fun FeedScreenContent(
     modifier: Modifier = Modifier
 ) {
 
-    val contentPadding = PaddingValues(
-        horizontal = 8.dp,
-        vertical = 0.dp
-    ) + innerPadding
+    val contentPadding = remember(innerPadding) {
+        PaddingValues(
+            horizontal = 8.dp,
+        ) + innerPadding
+    }
 
     Box(
         modifier = modifier

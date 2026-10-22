@@ -1,26 +1,30 @@
 package dev.jn.enois.presentation.feed
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import dev.jn.enois.domain.model.FeedPost
+import dev.jn.enois.presentation.components.avatar.fx.ProvideAvatarFxClock
 import dev.jn.enois.presentation.feed.components.FeedScreenContent
 import dev.jn.enois.presentation.feed.components.FeedToolbar
+import kotlinx.coroutines.flow.filter
 import org.koin.androidx.compose.koinViewModel
 
 
@@ -54,50 +58,54 @@ private fun FeedScreen(
 ) {
 
     val listState = rememberLazyListState()
-    var toolbarVisible by remember { mutableStateOf(true) }
 
-    LaunchedEffect(listState) {
-        var previousIndex = listState.firstVisibleItemIndex
-        var previousOffset = listState.firstVisibleItemScrollOffset
+    var toolbarHeightPx by remember { mutableFloatStateOf(0f) }
+    var toolbarOffsetPx by remember { mutableFloatStateOf(0f) }
 
-        snapshotFlow {
-            listState.firstVisibleItemIndex to
-                    listState.firstVisibleItemScrollOffset
-        }.collect { (index, offset) ->
-            val delta =
-                (index - previousIndex) * 1000 +
-                        (offset - previousOffset)
-
-            if (index == 0 && offset == 0) {
-                toolbarVisible = true
-            } else if (kotlin.math.abs(delta) > 4) {
-                toolbarVisible = delta < 0
+    val scrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                toolbarOffsetPx = (toolbarOffsetPx + available.y).coerceIn(-toolbarHeightPx, 0f)
+                return Offset.Zero
             }
-            previousIndex = index
-            previousOffset = offset
         }
     }
 
-    Scaffold(
-        modifier = modifier,
-        topBar = {
-            AnimatedVisibility(
-                visible = toolbarVisible,
-                enter = slideInVertically { -it } + fadeIn(),
-                exit = slideOutVertically { -it } + fadeOut()
-            ) {
-                FeedToolbar(
-                    userProfile = uiState.userProfile
-                )
-            }
-        },
-    ) { innerPadding ->
+    LaunchedEffect(listState) {
+        snapshotFlow { listState.canScrollBackward }
+            .filter { !it }
+            .collect { toolbarOffsetPx = 0f }
+    }
 
-        FeedScreenContent(
-            posts = posts,
-            listState = listState,
-            innerPadding = innerPadding,
-            onNavigateToPostDetails = onNavigateToPostDetails,
-        )
+    ProvideAvatarFxClock(
+        paused = { listState.isScrollInProgress }) {
+
+
+        Scaffold(
+            modifier = modifier.nestedScroll(scrollConnection),
+            topBar = {
+                Box(
+                    Modifier
+                        .onSizeChanged { toolbarHeightPx = it.height.toFloat() }
+                        .graphicsLayer {
+                            translationY = toolbarOffsetPx
+                            alpha =
+                                if (toolbarHeightPx > 0f) 1f + toolbarOffsetPx / toolbarHeightPx else 1f
+                        },
+                ) {
+                    FeedToolbar(
+                        userProfile = uiState.userProfile
+                    )
+                }
+            },
+        ) { innerPadding ->
+
+            FeedScreenContent(
+                posts = posts,
+                listState = listState,
+                innerPadding = innerPadding,
+                onNavigateToPostDetails = onNavigateToPostDetails,
+            )
+        }
     }
 }

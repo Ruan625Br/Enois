@@ -2,10 +2,6 @@ package dev.jn.enois.presentation.components.avatar.fx
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.mutableFloatStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.withFrameNanos
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -18,15 +14,7 @@ import dev.jn.enois.domain.model.AvatarFrameType
 
 @Composable
 fun AvatarFrameFx(frame: AvatarFrameType, modifier: Modifier = Modifier) {
-    val clock = remember { mutableFloatStateOf(0f) }
-    LaunchedEffect(Unit) {
-        val start = withFrameNanos { it }
-        while (true) {
-            withFrameNanos {
-                clock.floatValue = (((it - start) / 1_000_000_000.0) % 3600.0).toFloat()
-            }
-        }
-    }
+    val clock = LocalAvatarFxClock.current ?: rememberFreeRunningClock()
 
     Canvas(modifier) {
         val t = clock.floatValue
