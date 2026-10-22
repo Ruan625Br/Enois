@@ -1,4 +1,4 @@
-package dev.jn.enois.ui.components
+package dev.jn.enois.presentation.components.badge
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import dev.jn.enois.presentation.components.avatar.resolveCdnUrl
 
 @Composable
 fun UserBadges(
@@ -58,7 +59,7 @@ private fun UserBadge(
 
     Box(
         modifier
-            .size(11.dp)
+            .size(15.dp)
             .clip(shape)
     ) {
         AsyncImage(

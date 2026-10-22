@@ -4,6 +4,7 @@ import dev.jn.enois.data.remote.dto.feed.FeedPostDto
 import dev.jn.enois.data.remote.dto.feed.FeedResponseDto
 import dev.jn.enois.data.remote.dto.feed.PostCommunityDto
 import dev.jn.enois.data.remote.dto.feed.PostCountersDto
+import dev.jn.enois.domain.model.AvatarFrameType
 import dev.jn.enois.domain.model.FeedPage
 import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.domain.model.PostCommunity
@@ -24,7 +25,7 @@ fun FeedPostDto.toDomain() = FeedPost(
     authorBadge = authorBadge,
     authorBadges = authorBadges,
     authorAvatar = authorAvatar,
-    authorAvatarFrame = authorAvatarFrame,
+    authorAvatarFrame = AvatarFrameType.fromFxName(authorAvatarFrame),
     authorIdentity = authorIdentity,
     type = type,
     content = content,

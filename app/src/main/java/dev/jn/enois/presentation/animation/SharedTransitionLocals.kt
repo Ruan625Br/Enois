@@ -1,4 +1,4 @@
-package dev.jn.enois.ui.animation
+package dev.jn.enois.presentation.animation
 
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.runtime.staticCompositionLocalOf

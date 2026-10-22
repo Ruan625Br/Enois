@@ -1,34 +1,40 @@
-package dev.jn.enois.ui.components
+package dev.jn.enois.presentation.components.avatar
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
+import dev.jn.enois.domain.model.AvatarFrameType
+import dev.jn.enois.presentation.components.avatar.fx.AvatarFrameFx
 
 @Composable
 fun UserAvatar(
     url: String,
     userName: String,
     modifier: Modifier = Modifier,
+    frame: AvatarFrameType? = null,
     textStyle: TextStyle = MaterialTheme.typography.titleLarge,
-    shape: Shape = MaterialTheme.shapes.medium
+    shape: Shape = MaterialTheme.shapes.medium,
+    size: Dp = 45.dp,
 ) {
 
     val context = LocalPlatformContext.current
@@ -42,42 +48,39 @@ fun UserAvatar(
             .data(urlResolved)
             .build()
     }
-    var loadFallback by rememberSaveable { mutableStateOf(false) }
-    var isLoading by rememberSaveable { mutableStateOf(true) }
+    var failed by remember(urlResolved) { mutableStateOf(false) }
+    var loading by remember(urlResolved) { mutableStateOf(true) }
 
     Box(
-        modifier
-            .size(45.dp)
-            .clip(shape)
+        modifier = modifier.size(size),
+        contentAlignment = Alignment.Center,
     ) {
-        if (isLoading) {
-            UserAvatarFallback(
-                userName = userName,
-                style = textStyle,
-            )
+        Box(
+            Modifier
+                .matchParentSize()
+                .clip(if (frame != null) CircleShape else shape),
+        ) {
+            if (loading || failed) {
+                UserAvatarFallback(userName = userName, style = textStyle)
+            }
+
+            if (!failed) {
+                AsyncImage(
+                    model = model,
+                    contentDescription = null,
+                    modifier = Modifier.fillMaxSize(),
+                    onLoading = { loading = true },
+                    onSuccess = { loading = false },
+                    onError = {
+                        loading = false
+                        failed = true
+                    },
+                )
+            }
         }
-        if (loadFallback) {
-            UserAvatarFallback(
-                userName = userName,
-                style = textStyle,
-            )
-        } else {
-            AsyncImage(
-                model = model,
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxSize(),
-                onLoading = {
-                    isLoading = true
-                },
-                onSuccess = {
-                    isLoading = false
-                },
-                onError = {
-                    isLoading = false
-                    loadFallback = true
-                }
-            )
+
+        if (frame != null) {
+            AvatarFrameFx(frame = frame, modifier = Modifier.requiredSize(size * 1.6f))
         }
     }
 }

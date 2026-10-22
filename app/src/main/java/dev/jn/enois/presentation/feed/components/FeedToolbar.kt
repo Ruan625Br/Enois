@@ -19,7 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.jn.enois.domain.model.UserProfile
-import dev.jn.enois.ui.animation.LocalSharedTransitionScope
+import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.ui.icons.AppIcons
 
 @Composable

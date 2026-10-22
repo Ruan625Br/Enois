@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -21,9 +22,9 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.jn.enois.core.util.formatTime
 import dev.jn.enois.domain.model.FeedPost
-import dev.jn.enois.ui.animation.LocalSharedTransitionScope
-import dev.jn.enois.ui.components.UserAvatar
-import dev.jn.enois.ui.components.UserBadges
+import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
+import dev.jn.enois.presentation.components.avatar.UserAvatar
+import dev.jn.enois.presentation.components.badge.UserBadges
 
 private const val POST_COMPACT_THRESHOLD = 400
 private const val POST_MAX_LINES = 15
@@ -75,8 +76,8 @@ fun FeedPostItemContent(
     ) {
         Column(
             modifier = Modifier
-
-                .padding(8.dp)
+                .padding(8.dp),
+            verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             PostHeader(
                 post = post,
@@ -114,28 +115,32 @@ private fun PostHeader(
 
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(10.dp)
     ) {
         UserAvatar(
             url = post.authorAvatar.orEmpty(),
-            userName = post.authorName
+            userName = post.authorName,
+            frame = post.authorAvatarFrame
         )
+
         Row(
             modifier = Modifier
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
-            Text(
-                text = post.authorName,
-                modifier = Modifier.weight(1f, fill = false),
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Column {
+                Text(
+                    text = post.authorName,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
 
-            UserBadges(badges = badges)
+                UserBadges(badges = badges)
+            }
+
 
             Spacer(
                 modifier = Modifier

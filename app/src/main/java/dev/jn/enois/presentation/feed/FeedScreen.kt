@@ -98,7 +98,6 @@ private fun FeedScreen(
             listState = listState,
             innerPadding = innerPadding,
             onNavigateToPostDetails = onNavigateToPostDetails,
-            modifier = modifier
         )
     }
 }

@@ -26,7 +26,7 @@ import dev.jn.enois.presentation.auth.login.LoginRoute
 import dev.jn.enois.presentation.auth.register.RegisterRoute
 import dev.jn.enois.presentation.feed.FeedRoute
 import dev.jn.enois.presentation.postdetails.PostDetailRoute
-import dev.jn.enois.ui.animation.LocalSharedTransitionScope
+import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import org.koin.androidx.compose.koinViewModel
 
 @Composable

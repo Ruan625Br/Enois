@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.jn.enois.presentation.feed.components.FeedTopFadeOverlay
 import dev.jn.enois.presentation.feed.components.toolbarSharedBounds
-import dev.jn.enois.ui.animation.LocalSharedTransitionScope
+import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.ui.icons.AppIcons
 
 @Composable
