@@ -24,6 +24,7 @@ import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.presentation.components.avatar.UserAvatar
 import dev.jn.enois.presentation.components.badge.UserBadges
+import dev.jn.enois.presentation.media.MediaUiState
 
 private const val POST_COMPACT_THRESHOLD = 400
 private const val POST_MAX_LINES = 15
@@ -32,6 +33,9 @@ private const val POST_MAX_LINES = 15
 fun FeedPostItem(
     post: FeedPost,
     onPostClick: () -> Unit,
+    onMediaClick: (String) -> Unit,
+    mediaUiState: MediaUiState,
+    onLoadMedia: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
     showFullPost: Boolean = false
 ) {
@@ -40,6 +44,9 @@ fun FeedPostItem(
     FeedPostItemContent(
         post = post,
         onPostClick = onPostClick,
+        onMediaClick = onMediaClick,
+        mediaUiState = mediaUiState,
+        onLoadMedia = onLoadMedia,
         modifier = modifier,
         showFullPost = showFullPost
     )
@@ -49,6 +56,9 @@ fun FeedPostItem(
 fun FeedPostItemContent(
     post: FeedPost,
     onPostClick: () -> Unit,
+    onMediaClick: (String) -> Unit,
+    mediaUiState: MediaUiState,
+    onLoadMedia: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
     showFullPost: Boolean = false,
 ) {
@@ -98,6 +108,15 @@ fun FeedPostItemContent(
                     Text("Ler mais")
                 }
             }
+
+            PostMediaGrid(
+                mediaIds = post.mediaIds,
+                mediaUiState = mediaUiState,
+                onLoadMedia = onLoadMedia,
+                onMediaClick = {
+                    onMediaClick(it.id)
+                }
+            )
 
         }
     }

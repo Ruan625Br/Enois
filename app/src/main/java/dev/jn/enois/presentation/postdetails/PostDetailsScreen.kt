@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jn.enois.presentation.feed.components.FeedPostItem
+import dev.jn.enois.presentation.media.MediaUiState
+import dev.jn.enois.presentation.media.MediaViewModel
 import dev.jn.enois.presentation.postdetails.components.PostDetailsToolbar
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
@@ -22,17 +24,24 @@ import org.koin.core.parameter.parametersOf
 fun PostDetailRoute(
     postId: String,
     onBack: () -> Unit,
+    onNavigateToMediaViewer: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
     val viewModel: PostDetailsViewModel = koinViewModel {
         parametersOf(postId)
     }
+    val mediaViewModel: MediaViewModel = koinViewModel()
+
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val mediaUiState by mediaViewModel.uiState.collectAsStateWithLifecycle()
 
     PostDetailsScreen(
         uiState = uiState,
         onBack = onBack,
+        mediaUiState = mediaUiState,
+        onLoadMedia = mediaViewModel::loadMedia,
+        onNavigateToMediaViewer = onNavigateToMediaViewer,
         modifier = modifier
     )
 }
@@ -40,6 +49,9 @@ fun PostDetailRoute(
 @Composable
 private fun PostDetailsScreen(
     uiState: PostDetailsUiState,
+    mediaUiState: MediaUiState,
+    onNavigateToMediaViewer: (String) -> Unit,
+    onLoadMedia: (List<String>) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -64,8 +76,11 @@ private fun PostDetailsScreen(
             if (uiState.post != null) {
                 FeedPostItem(
                     post = uiState.post,
+                    mediaUiState = mediaUiState,
+                    onLoadMedia = onLoadMedia,
                     showFullPost = true,
-                    onPostClick = {}
+                    onPostClick = {},
+                    onMediaClick = onNavigateToMediaViewer
                 )
 
             }

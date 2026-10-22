@@ -34,7 +34,7 @@ fun UserAvatar(
     frame: AvatarFrameType? = null,
     textStyle: TextStyle = MaterialTheme.typography.titleLarge,
     shape: Shape = MaterialTheme.shapes.medium,
-    size: Dp = 45.dp,
+    size: Dp = 40.dp,
 ) {
 
     val context = LocalPlatformContext.current

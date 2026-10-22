@@ -24,6 +24,8 @@ import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.presentation.components.avatar.fx.ProvideAvatarFxClock
 import dev.jn.enois.presentation.feed.components.FeedScreenContent
 import dev.jn.enois.presentation.feed.components.FeedToolbar
+import dev.jn.enois.presentation.media.MediaUiState
+import dev.jn.enois.presentation.media.MediaViewModel
 import kotlinx.coroutines.flow.filter
 import org.koin.androidx.compose.koinViewModel
 
@@ -31,29 +33,38 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun FeedRoute(
     onNavigateToPostDetails: (String) -> Unit,
+    onNavigateToMediaViewer: (String) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FeedViewModel = koinViewModel(),
+    feedViewModel: FeedViewModel = koinViewModel(),
+    mediaViewModel: MediaViewModel = koinViewModel()
 ) {
 
-    val uiState = viewModel.uiState.collectAsStateWithLifecycle()
-    val posts = viewModel.posts.collectAsLazyPagingItems()
+    val feedUiState by feedViewModel.uiState.collectAsStateWithLifecycle()
+    val mediaUiState by mediaViewModel.uiState.collectAsStateWithLifecycle()
+    val posts = feedViewModel.posts.collectAsLazyPagingItems()
 
     FeedScreen(
-        uiState = uiState.value,
+        feedUiState = feedUiState,
+        mediaUiState = mediaUiState,
         posts = posts,
         onNavigateToPostDetails = { post ->
-            viewModel.addPostToCache(post)
+            feedViewModel.addPostToCache(post)
             onNavigateToPostDetails(post.id)
         },
+        onNavigateToMediaViewer = onNavigateToMediaViewer,
+        onLoadMedia = mediaViewModel::loadMedia,
         modifier = modifier
     )
 }
 
 @Composable
 private fun FeedScreen(
-    uiState: FeedUiState,
+    feedUiState: FeedUiState,
+    mediaUiState: MediaUiState,
+    onLoadMedia: (List<String>) -> Unit,
     posts: LazyPagingItems<FeedPost>,
     onNavigateToPostDetails: (FeedPost) -> Unit,
+    onNavigateToMediaViewer: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -94,7 +105,7 @@ private fun FeedScreen(
                         },
                 ) {
                     FeedToolbar(
-                        userProfile = uiState.userProfile
+                        userProfile = feedUiState.userProfile
                     )
                 }
             },
@@ -104,7 +115,10 @@ private fun FeedScreen(
                 posts = posts,
                 listState = listState,
                 innerPadding = innerPadding,
+                mediaUiState = mediaUiState,
+                onLoadMedia = onLoadMedia,
                 onNavigateToPostDetails = onNavigateToPostDetails,
+                onNavigateToMediaViewer = onNavigateToMediaViewer
             )
         }
     }

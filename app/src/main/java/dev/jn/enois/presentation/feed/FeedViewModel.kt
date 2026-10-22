@@ -1,5 +1,6 @@
 package dev.jn.enois.presentation.feed
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.Pager
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+@Stable
 class FeedViewModel(
     private val feedRepository: FeedRepository,
     private val userProfileRepository: UserProfileRepository,

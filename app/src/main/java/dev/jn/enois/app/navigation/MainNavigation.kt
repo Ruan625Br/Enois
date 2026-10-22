@@ -27,6 +27,7 @@ import dev.jn.enois.presentation.auth.register.RegisterRoute
 import dev.jn.enois.presentation.feed.FeedRoute
 import dev.jn.enois.presentation.postdetails.PostDetailRoute
 import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
+import dev.jn.enois.presentation.media.viewer.MediaViewerRoute
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -111,6 +112,9 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                                 onNavigateToPostDetails = { postId ->
                                     backStack.add(AppScreen.PostDetailsScreen(postId))
                                 },
+                                onNavigateToMediaViewer = { mediaId ->
+                                    backStack.add(AppScreen.MediaViewer(mediaId))
+                                }
                             )
                         }
 
@@ -119,7 +123,16 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                                 postId = key.postId,
                                 onBack = {
                                     backStack.removeLastOrNull()
+                                },
+                                onNavigateToMediaViewer = { mediaId ->
+                                    backStack.add(AppScreen.MediaViewer(mediaId))
                                 }
+                            )
+                        }
+
+                        entry<AppScreen.MediaViewer> { key ->
+                            MediaViewerRoute(
+                                mediaId = key.mediaId
                             )
                         }
                     }

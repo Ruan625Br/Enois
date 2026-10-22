@@ -19,13 +19,17 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import dev.jn.enois.domain.model.FeedPost
+import dev.jn.enois.presentation.media.MediaUiState
 
 @Composable
 fun FeedScreenContent(
     posts: LazyPagingItems<FeedPost>,
     listState: LazyListState,
     innerPadding: PaddingValues,
+    mediaUiState: MediaUiState,
+    onLoadMedia: (List<String>) -> Unit,
     onNavigateToPostDetails: (FeedPost) -> Unit,
+    onNavigateToMediaViewer: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -53,7 +57,10 @@ fun FeedScreenContent(
                 posts[index]?.let { post ->
                     FeedPostItem(
                         post = post,
-                        onPostClick = { onNavigateToPostDetails(post) })
+                        mediaUiState = mediaUiState,
+                        onLoadMedia = onLoadMedia,
+                        onPostClick = { onNavigateToPostDetails(post) },
+                        onMediaClick = { onNavigateToMediaViewer(it) })
                 }
             }
 
