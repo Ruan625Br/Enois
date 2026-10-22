@@ -15,6 +15,11 @@ import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -35,13 +40,24 @@ fun ReactionSummary(
 
     if (counts.isEmpty()) return
 
+    var reactionOrder by remember {
+        mutableStateOf(emptyList<ReactionType>())
+    }
+
+    LaunchedEffect(counts.keys) {
+        reactionOrder = stableReactionOrder(
+            counts = counts,
+            previousOrder = reactionOrder,
+        )
+    }
 
     FlowRow(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(6.dp)
     ) {
-        counts.forEach { (type, count) ->
+        reactionOrder.forEach { type ->
             val selected = userReaction == type
+            val count = counts[type] ?: 0
 
             ElevatedFilterChip(
                 selected = selected,
@@ -110,4 +126,20 @@ private fun AnimatedReactionCount(
             color = color,
         )
     }
+}
+
+private fun stableReactionOrder(
+    counts: Map<ReactionType, Int>,
+    previousOrder: List<ReactionType>,
+): List<ReactionType> {
+    val activeTypes = counts
+        .filterValues { it > 0 }
+        .keys
+
+    val retained = previousOrder.filter { it in activeTypes }
+
+    val newTypes = (activeTypes - retained.toSet())
+        .sortedBy { it.name }
+
+    return retained + newTypes
 }
