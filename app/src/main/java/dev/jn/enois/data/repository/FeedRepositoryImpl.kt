@@ -6,9 +6,7 @@ import dev.jn.enois.data.remote.api.FeedApi
 import dev.jn.enois.domain.model.FeedPage
 import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.domain.model.FeedTab
-import dev.jn.enois.domain.model.SessionState
 import dev.jn.enois.domain.repository.FeedRepository
-import dev.jn.enois.domain.repository.SessionRepository
 import kotlin.coroutines.cancellation.CancellationException
 
 class FeedRepositoryImpl(

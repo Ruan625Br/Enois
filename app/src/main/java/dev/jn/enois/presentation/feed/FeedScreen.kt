@@ -21,11 +21,16 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import dev.jn.enois.domain.model.FeedPost
+import dev.jn.enois.domain.model.ReactionSummary
+import dev.jn.enois.domain.model.ReactionType
 import dev.jn.enois.presentation.components.avatar.fx.ProvideAvatarFxClock
 import dev.jn.enois.presentation.feed.components.FeedScreenContent
 import dev.jn.enois.presentation.feed.components.FeedToolbar
 import dev.jn.enois.presentation.media.MediaUiState
 import dev.jn.enois.presentation.media.MediaViewModel
+import dev.jn.enois.presentation.reactions.PostReactionsState
+import dev.jn.enois.presentation.reactions.ReactionAction
+import dev.jn.enois.presentation.reactions.ReactionViewModel
 import kotlinx.coroutines.flow.filter
 import org.koin.androidx.compose.koinViewModel
 
@@ -36,16 +41,19 @@ fun FeedRoute(
     onNavigateToMediaViewer: (String) -> Unit,
     modifier: Modifier = Modifier,
     feedViewModel: FeedViewModel = koinViewModel(),
-    mediaViewModel: MediaViewModel = koinViewModel()
+    mediaViewModel: MediaViewModel = koinViewModel(),
+    reactionViewModel: ReactionViewModel = koinViewModel()
 ) {
 
     val feedUiState by feedViewModel.uiState.collectAsStateWithLifecycle()
     val mediaUiState by mediaViewModel.uiState.collectAsStateWithLifecycle()
     val posts = feedViewModel.posts.collectAsLazyPagingItems()
+    val reactionStates by reactionViewModel.states.collectAsStateWithLifecycle()
 
     FeedScreen(
         feedUiState = feedUiState,
         mediaUiState = mediaUiState,
+        reactionStates = reactionStates,
         posts = posts,
         onNavigateToPostDetails = { post ->
             feedViewModel.addPostToCache(post)
@@ -53,6 +61,8 @@ fun FeedRoute(
         },
         onNavigateToMediaViewer = onNavigateToMediaViewer,
         onLoadMedia = mediaViewModel::loadMedia,
+        onProvideReactionSummary = reactionViewModel::provideFeedSummary,
+        onReactionAction = reactionViewModel::onReactionAction,
         modifier = modifier
     )
 }
@@ -61,7 +71,10 @@ fun FeedRoute(
 private fun FeedScreen(
     feedUiState: FeedUiState,
     mediaUiState: MediaUiState,
+    reactionStates: Map<String, PostReactionsState>,
+    onReactionAction: (ReactionAction) -> Unit,
     onLoadMedia: (List<String>) -> Unit,
+    onProvideReactionSummary: (String, ReactionSummary, ReactionType?) -> Unit,
     posts: LazyPagingItems<FeedPost>,
     onNavigateToPostDetails: (FeedPost) -> Unit,
     onNavigateToMediaViewer: (String) -> Unit,
@@ -116,7 +129,10 @@ private fun FeedScreen(
                 listState = listState,
                 innerPadding = innerPadding,
                 mediaUiState = mediaUiState,
+                reactionStates = reactionStates,
+                onReactionAction = onReactionAction,
                 onLoadMedia = onLoadMedia,
+                onProvideReactionSummary = onProvideReactionSummary,
                 onNavigateToPostDetails = onNavigateToPostDetails,
                 onNavigateToMediaViewer = onNavigateToMediaViewer
             )

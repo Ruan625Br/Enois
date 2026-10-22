@@ -19,7 +19,11 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
 import dev.jn.enois.domain.model.FeedPost
+import dev.jn.enois.domain.model.ReactionSummary
+import dev.jn.enois.domain.model.ReactionType
 import dev.jn.enois.presentation.media.MediaUiState
+import dev.jn.enois.presentation.reactions.PostReactionsState
+import dev.jn.enois.presentation.reactions.ReactionAction
 
 @Composable
 fun FeedScreenContent(
@@ -27,7 +31,10 @@ fun FeedScreenContent(
     listState: LazyListState,
     innerPadding: PaddingValues,
     mediaUiState: MediaUiState,
+    reactionStates: Map<String, PostReactionsState>,
+    onReactionAction: (ReactionAction) -> Unit,
     onLoadMedia: (List<String>) -> Unit,
+    onProvideReactionSummary: (String, ReactionSummary, ReactionType?) -> Unit,
     onNavigateToPostDetails: (FeedPost) -> Unit,
     onNavigateToMediaViewer: (String) -> Unit,
     modifier: Modifier = Modifier
@@ -55,12 +62,25 @@ fun FeedScreenContent(
                 contentType = posts.itemContentType { "post" }) { index ->
 
                 posts[index]?.let { post ->
+
+                    val reactionState = reactionStates[post.id] ?: PostReactionsState()
+
                     FeedPostItem(
                         post = post,
                         mediaUiState = mediaUiState,
+                        reactionState = reactionState,
                         onLoadMedia = onLoadMedia,
+                        onProvideReactionSummary = { postId, summary ->
+                            onProvideReactionSummary(
+                                postId,
+                                summary,
+                                post.currentUserReaction
+                            )
+                        },
                         onPostClick = { onNavigateToPostDetails(post) },
-                        onMediaClick = { onNavigateToMediaViewer(it) })
+                        onMediaClick = { onNavigateToMediaViewer(it) },
+                        onReactionAction = onReactionAction
+                    )
                 }
             }
 

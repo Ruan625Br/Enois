@@ -12,10 +12,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import dev.jn.enois.domain.model.ReactionSummary
+import dev.jn.enois.domain.model.ReactionType
 import dev.jn.enois.presentation.feed.components.FeedPostItem
 import dev.jn.enois.presentation.media.MediaUiState
 import dev.jn.enois.presentation.media.MediaViewModel
 import dev.jn.enois.presentation.postdetails.components.PostDetailsToolbar
+import dev.jn.enois.presentation.reactions.PostReactionsState
+import dev.jn.enois.presentation.reactions.ReactionAction
+import dev.jn.enois.presentation.reactions.ReactionViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 
@@ -25,23 +30,29 @@ fun PostDetailRoute(
     postId: String,
     onBack: () -> Unit,
     onNavigateToMediaViewer: (String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
 
     val viewModel: PostDetailsViewModel = koinViewModel {
         parametersOf(postId)
     }
     val mediaViewModel: MediaViewModel = koinViewModel()
+    val reactionViewModel: ReactionViewModel = koinViewModel()
+
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val mediaUiState by mediaViewModel.uiState.collectAsStateWithLifecycle()
+    val reactionStates by reactionViewModel.states.collectAsStateWithLifecycle()
 
     PostDetailsScreen(
         uiState = uiState,
         onBack = onBack,
         mediaUiState = mediaUiState,
+        reactionStates = reactionStates,
         onLoadMedia = mediaViewModel::loadMedia,
         onNavigateToMediaViewer = onNavigateToMediaViewer,
+        onProvideReactionSummary = reactionViewModel::provideFeedSummary,
+        onReactionAction = reactionViewModel::onReactionAction,
         modifier = modifier
     )
 }
@@ -50,8 +61,11 @@ fun PostDetailRoute(
 private fun PostDetailsScreen(
     uiState: PostDetailsUiState,
     mediaUiState: MediaUiState,
+    reactionStates: Map<String, PostReactionsState>,
     onNavigateToMediaViewer: (String) -> Unit,
     onLoadMedia: (List<String>) -> Unit,
+    onReactionAction: (ReactionAction) -> Unit,
+    onProvideReactionSummary: (String, ReactionSummary, ReactionType?) -> Unit,
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -73,13 +87,21 @@ private fun PostDetailsScreen(
                 .padding(contentPadding)
                 .verticalScroll(rememberScrollState())
         ) {
-            if (uiState.post != null) {
+            val post = uiState.post
+            if (post != null) {
+                val reactionState = reactionStates[post.id] ?: PostReactionsState()
+
                 FeedPostItem(
-                    post = uiState.post,
+                    post = post,
                     mediaUiState = mediaUiState,
+                    reactionState = reactionState,
                     onLoadMedia = onLoadMedia,
+                    onProvideReactionSummary = { postId, summary ->
+                        onProvideReactionSummary(postId, summary, post.currentUserReaction)
+                    },
                     showFullPost = true,
                     onPostClick = {},
+                    onReactionAction = onReactionAction,
                     onMediaClick = onNavigateToMediaViewer
                 )
 

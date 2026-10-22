@@ -1,9 +1,11 @@
 package dev.jn.enois.data.remote.dto.feed
 
+import dev.jn.enois.data.remote.dto.reaction.ReactionSummaryDto
 import dev.jn.enois.domain.model.AuthorIdentity
 import dev.jn.enois.domain.model.PostStatus
 import dev.jn.enois.domain.model.PostType
 import dev.jn.enois.domain.model.PostVisibility
+import dev.jn.enois.domain.model.ReactionType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -27,7 +29,8 @@ data class FeedPostDto(
     val visibility: PostVisibility = PostVisibility.PUBLIC,
     val counters: PostCountersDto,
     val status: PostStatus = PostStatus.ACTIVE,
-    val currentUserReaction: String?,
+    val currentUserReaction: ReactionType?,
+    val reactionSummary: ReactionSummaryDto?,
     val communityId: String?,
     val community: PostCommunityDto?,
     val editedAt: String?,

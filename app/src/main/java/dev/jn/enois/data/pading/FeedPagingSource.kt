@@ -10,33 +10,33 @@ import kotlin.coroutines.cancellation.CancellationException
 class FeedPagingSource(
     private val repository: FeedRepository,
     private val tab: FeedTab
-): PagingSource<String, FeedPost>() {
+) : PagingSource<String, FeedPost>() {
 
     override suspend fun load(params: LoadParams<String>): LoadResult<String, FeedPost> {
-       return try {
-           val result = repository.getFeed(
-               tab,
-               cursor = params.key,
-               limit = params.loadSize.coerceAtMost(50)
-           )
+        return try {
+            val result = repository.getFeed(
+                tab,
+                cursor = params.key,
+                limit = params.loadSize.coerceAtMost(50)
+            )
 
-           result.fold(
-               onSuccess = { page ->
-                   LoadResult.Page(
-                       data = page.posts,
-                       prevKey = null,
-                       nextKey = page.nextCursor
-                   )
-               },
-               onFailure = { error ->
-                   LoadResult.Error(error)
-               }
-           )
-       } catch (e: CancellationException) {
-           throw e
-       } catch (e: Exception) {
-           LoadResult.Error(e)
-       }
+            result.fold(
+                onSuccess = { page ->
+                    LoadResult.Page(
+                        data = page.posts,
+                        prevKey = null,
+                        nextKey = page.nextCursor
+                    )
+                },
+                onFailure = { error ->
+                    LoadResult.Error(error)
+                }
+            )
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            LoadResult.Error(e)
+        }
     }
 
     override fun getRefreshKey(state: PagingState<String, FeedPost>): String? = null

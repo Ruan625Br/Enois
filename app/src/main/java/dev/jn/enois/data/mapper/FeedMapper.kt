@@ -38,6 +38,7 @@ fun FeedPostDto.toDomain() = FeedPost(
     counters = counters.toDomain(),
     status = status,
     currentUserReaction = currentUserReaction,
+    reactionSummary = reactionSummary?.toDomain(),
     communityId = communityId,
     community = community?.toDomain(),
     editedAt = editedAt,

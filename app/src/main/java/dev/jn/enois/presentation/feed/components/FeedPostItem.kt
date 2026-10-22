@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,10 +23,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.jn.enois.core.util.formatTime
 import dev.jn.enois.domain.model.FeedPost
+import dev.jn.enois.domain.model.ReactionSummary
 import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.presentation.components.avatar.UserAvatar
 import dev.jn.enois.presentation.components.badge.UserBadges
 import dev.jn.enois.presentation.media.MediaUiState
+import dev.jn.enois.presentation.reactions.PostReactionsState
+import dev.jn.enois.presentation.reactions.ReactionAction
 
 private const val POST_COMPACT_THRESHOLD = 400
 private const val POST_MAX_LINES = 15
@@ -34,18 +39,29 @@ fun FeedPostItem(
     post: FeedPost,
     onPostClick: () -> Unit,
     onMediaClick: (String) -> Unit,
+    onReactionAction: (ReactionAction) -> Unit,
     mediaUiState: MediaUiState,
+    reactionState: PostReactionsState,
     onLoadMedia: (List<String>) -> Unit,
+    onProvideReactionSummary: (String, ReactionSummary) -> Unit,
     modifier: Modifier = Modifier,
     showFullPost: Boolean = false
 ) {
+
+    LaunchedEffect(post.id, post.reactionSummary) {
+        post.reactionSummary?.let { summary ->
+            onProvideReactionSummary(post.id, summary)
+        }
+    }
 
 
     FeedPostItemContent(
         post = post,
         onPostClick = onPostClick,
         onMediaClick = onMediaClick,
+        onReactionAction = onReactionAction,
         mediaUiState = mediaUiState,
+        reactionState = reactionState,
         onLoadMedia = onLoadMedia,
         modifier = modifier,
         showFullPost = showFullPost
@@ -57,7 +73,9 @@ fun FeedPostItemContent(
     post: FeedPost,
     onPostClick: () -> Unit,
     onMediaClick: (String) -> Unit,
+    onReactionAction: (ReactionAction) -> Unit,
     mediaUiState: MediaUiState,
+    reactionState: PostReactionsState,
     onLoadMedia: (List<String>) -> Unit,
     modifier: Modifier = Modifier,
     showFullPost: Boolean = false,
@@ -117,6 +135,22 @@ fun FeedPostItemContent(
                     onMediaClick(it.id)
                 }
             )
+
+            ReactionSummary(
+                summary = reactionState.summary,
+                userReaction = reactionState.userReaction,
+                reactionPending = reactionState.isPending,
+                onReactionClick = {
+                    onReactionAction(
+                        ReactionAction.Click(
+                            postId = post.id,
+                            type = it
+                        )
+                    )
+                }
+            )
+
+            HorizontalDivider()
 
         }
     }
