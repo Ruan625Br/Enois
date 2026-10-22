@@ -1,6 +1,5 @@
 package dev.jn.enois.presentation.components.avatar
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.requiredSize
@@ -18,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -25,6 +25,7 @@ import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
 import dev.jn.enois.domain.model.AvatarFrameType
 import dev.jn.enois.presentation.components.avatar.fx.AvatarFrameFx
+import dev.mttmcknn.seaglass.seaGlass
 
 @Composable
 fun UserAvatar(
@@ -99,15 +100,13 @@ fun UserAvatarFallback(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(
-                MaterialTheme.colorScheme.primaryContainer
-            ),
+            .seaGlass(),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = initials,
             style = style,
-            color = MaterialTheme.colorScheme.onPrimaryContainer
+            fontWeight = FontWeight.Bold
         )
     }
 }

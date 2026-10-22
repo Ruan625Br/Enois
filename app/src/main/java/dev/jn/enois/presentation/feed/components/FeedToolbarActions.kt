@@ -29,6 +29,8 @@ import androidx.compose.ui.unit.dp
 import dev.jn.enois.domain.model.UserProfile
 import dev.jn.enois.presentation.components.avatar.UserAvatar
 import dev.jn.enois.ui.icons.AppIcons
+import dev.mttmcknn.seaglass.SeaGlassShape
+import dev.mttmcknn.seaglass.SeaGlassSurface
 
 @Composable
 fun FeedToolbarActions(
@@ -51,13 +53,10 @@ fun FeedToolbarActions(
         label = "top_pill_width"
     )
 
-    Surface(
-        shape = buttonShape,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        border = border,
+    SeaGlassSurface(
+        shape = SeaGlassShape.Rounded,
         modifier = modifier
             .size(width = pillWidth, height = topPillSize)
-            .clip(buttonShape)
     ) {
         Box(
             modifier = Modifier.fillMaxWidth()

@@ -5,6 +5,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import dev.jn.enois.app.navigation.MainNavigation
+import dev.jn.enois.ui.theme.EnoisGlass
 import dev.jn.enois.ui.theme.EnoisTheme
 
 class MainActivity : ComponentActivity() {
@@ -12,7 +13,10 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            EnoisTheme {
+
+            EnoisTheme(
+                glass = EnoisGlass.Mint
+            ) {
                 MainNavigation()
             }
         }

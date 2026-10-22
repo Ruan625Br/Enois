@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,12 +13,12 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
@@ -30,6 +31,9 @@ import dev.jn.enois.presentation.components.badge.UserBadges
 import dev.jn.enois.presentation.media.MediaUiState
 import dev.jn.enois.presentation.reactions.PostReactionsState
 import dev.jn.enois.presentation.reactions.ReactionAction
+import dev.mttmcknn.seaglass.SeaGlassButton
+import dev.mttmcknn.seaglass.SeaGlassShape
+import dev.mttmcknn.seaglass.SeaGlassTheme
 
 private const val POST_COMPACT_THRESHOLD = 400
 private const val POST_MAX_LINES = 15
@@ -92,6 +96,8 @@ fun FeedPostItemContent(
         formatTime(post.createdAt)
     }
 
+    val glassSeed = remember(post.id) { post.id.hashCode() }
+
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
@@ -101,6 +107,8 @@ fun FeedPostItemContent(
                 animatedVisibilityScope = LocalNavAnimatedContentScope.current
             )
     ) {
+
+
         Column(
             modifier = Modifier
                 .padding(8.dp),
@@ -118,12 +126,18 @@ fun FeedPostItemContent(
                 } else {
                     Int.MAX_VALUE
                 },
+                fontFamily = FontFamily.Serif,
                 overflow = TextOverflow.Ellipsis
             )
 
             if (isCompact) {
-                TextButton(onClick = onPostClick) {
-                    Text("Ler mais")
+                SeaGlassButton(
+                    onClick = onPostClick,
+                    shape = SeaGlassShape.Capsule,
+                    style = SeaGlassTheme.componentStyle.withSeed(glassSeed + 7),
+                    contentPadding = PaddingValues(horizontal = 18.dp, vertical = 8.dp),
+                ) {
+                    Text("Ler mais", style = MaterialTheme.typography.labelLarge)
                 }
             }
 
@@ -187,6 +201,7 @@ private fun PostHeader(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.titleSmall,
+                    fontFamily = FontFamily.Serif,
                     color = MaterialTheme.colorScheme.onSurface
                 )
 
@@ -201,6 +216,7 @@ private fun PostHeader(
             Text(
                 text = "· $formattedTime",
                 style = MaterialTheme.typography.labelMedium,
+                fontFamily = FontFamily.Serif,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 

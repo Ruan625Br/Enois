@@ -2,17 +2,14 @@ package dev.jn.enois.presentation.feed.components
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -21,11 +18,13 @@ import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.jn.enois.domain.model.UserProfile
 import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.ui.icons.AppIcons
+import dev.mttmcknn.seaglass.SeaGlassButton
 
 @Composable
 fun FeedToolbar(
     userProfile: UserProfile?,
-    modifier: Modifier = Modifier) {
+    modifier: Modifier = Modifier
+) {
     Box(
         modifier = modifier
             .toolbarSharedBounds(
@@ -60,25 +59,17 @@ fun FeedToolbar(
 
 @Composable
 private fun FeedToolbarDrawerButton(modifier: Modifier = Modifier) {
-    Surface(
+    SeaGlassButton(
         onClick = {},
-        shape = CircleShape,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        border = BorderStroke(
-            1.dp,
-            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.6f),
-        ),
-        modifier = modifier,
+        contentPadding = PaddingValues.Zero,
+        modifier = modifier
+            .size(48.dp),
     ) {
-        Box(
-            modifier = Modifier.size(48.dp),
-            contentAlignment = Alignment.Center,
-        ) {
-            Icon(
-                imageVector = AppIcons.RoundedMenu,
-                contentDescription = null,
-            )
-        }
+
+        Icon(
+            imageVector = AppIcons.RoundedMenu,
+            contentDescription = null,
+        )
     }
 }
 

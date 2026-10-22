@@ -16,6 +16,7 @@ paging = "3.5.3"
 coil = "3.6.3"
 lifecycleViewmodelNav3 = "2.11.0"
 nav3Core = "1.2.0"
+sea-glas = "0.1.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -61,6 +62,8 @@ paging-compose = { module = "androidx.paging:paging-compose", version.ref = "pag
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil"}
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coil"}
 coil-gif = { module = "io.coil-kt.coil3:coil-gif", version.ref = "coil"}
+
+sea-glass = { module = "dev.mttmcknn:sea-glass", version.ref = "sea-glas"}
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
