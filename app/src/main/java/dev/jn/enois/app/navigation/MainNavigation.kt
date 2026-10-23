@@ -28,6 +28,9 @@ import dev.jn.enois.presentation.auth.login.LoginRoute
 import dev.jn.enois.presentation.auth.register.RegisterRoute
 import dev.jn.enois.presentation.components.richtext.ProvideEmotes
 import dev.jn.enois.presentation.feed.FeedRoute
+import dev.jn.enois.presentation.postdetails.PostDetailRoute
+import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
+import dev.jn.enois.presentation.chat.ChatRoute
 import dev.jn.enois.presentation.media.viewer.MediaViewerRoute
 import dev.jn.enois.presentation.postdetails.PostDetailRoute
 import org.koin.androidx.compose.koinViewModel
@@ -121,26 +124,29 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                                 )
                             }
 
-                            entry<AppScreen.PostDetailsScreen> { key ->
-                                PostDetailRoute(
-                                    postId = key.postId,
-                                    onBack = {
-                                        backStack.removeLastOrNull()
-                                    },
-                                    onNavigateToMediaViewer = { mediaId ->
-                                        backStack.add(AppScreen.MediaViewer(mediaId))
-                                    }
-                                )
-                            }
-
-                            entry<AppScreen.MediaViewer> { key ->
-                                MediaViewerRoute(
-                                    mediaId = key.mediaId
-                                )
-                            }
+                        entry<AppScreen.PostDetailsScreen> { key ->
+                            PostDetailRoute(
+                                postId = key.postId,
+                                onBack = {
+                                    backStack.removeLastOrNull()
+                                },
+                                onNavigateToMediaViewer = { mediaId ->
+                                    backStack.add(AppScreen.MediaViewer(mediaId))
+                                }
+                            )
                         }
-                    )
-                }
+
+                        entry<AppScreen.MediaViewer> { key ->
+                            MediaViewerRoute(
+                                mediaId = key.mediaId
+                            )
+                        }
+
+                        entry<AppScreen.ChatScreen> {
+                            ChatRoute()
+                        }
+                    }
+                )
             }
         }
     }
