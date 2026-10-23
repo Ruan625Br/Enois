@@ -7,8 +7,9 @@ class LoginUseCase(
 ) {
 
     suspend operator fun invoke(
+        turnstileToken: String,
         email: String,
         password: String
-    ) = authRepository.login(email.trim(), password)
+    ) = authRepository.login(turnstileToken, email.trim(), password)
 
 }

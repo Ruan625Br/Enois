@@ -1,5 +1,6 @@
 package dev.jn.enois.data.remote.api
 
+import dev.jn.enois.data.remote.dto.auth.AuthConfigDto
 import dev.jn.enois.data.remote.dto.auth.AuthResponse
 import dev.jn.enois.data.remote.dto.auth.LoginRequest
 import dev.jn.enois.data.remote.dto.auth.RefreshTokenRequest
@@ -21,6 +22,7 @@ class AuthApi(
     private val client: HttpClient
 ) {
 
+    suspend fun getConfig(): AuthConfigDto = client.get("auth/config").body()
     suspend fun login(
         request: LoginRequest
     ): AuthResponse {
