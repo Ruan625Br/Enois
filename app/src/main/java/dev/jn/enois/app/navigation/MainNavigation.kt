@@ -27,6 +27,7 @@ import dev.jn.enois.presentation.auth.register.RegisterRoute
 import dev.jn.enois.presentation.feed.FeedRoute
 import dev.jn.enois.presentation.postdetails.PostDetailRoute
 import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
+import dev.jn.enois.presentation.chat.ChatRoute
 import dev.jn.enois.presentation.media.viewer.MediaViewerRoute
 import org.koin.androidx.compose.koinViewModel
 
@@ -134,6 +135,10 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                             MediaViewerRoute(
                                 mediaId = key.mediaId
                             )
+                        }
+
+                        entry<AppScreen.ChatScreen> {
+                            ChatRoute()
                         }
                     }
                 )
