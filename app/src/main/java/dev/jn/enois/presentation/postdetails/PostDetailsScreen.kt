@@ -9,11 +9,15 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import dev.jn.enois.domain.model.ReactionSummary
 import dev.jn.enois.domain.model.ReactionType
+import dev.jn.enois.presentation.components.comments.CommentsSheet
 import dev.jn.enois.presentation.feed.components.FeedPostItem
 import dev.jn.enois.presentation.media.MediaUiState
 import dev.jn.enois.presentation.media.MediaViewModel
@@ -82,6 +86,10 @@ private fun PostDetailsScreen(
             horizontal = 8.dp,
             vertical = 0.dp
         ) + innerPadding
+
+        var commentsPostId by rememberSaveable { mutableStateOf<String?>(null) }
+
+
         Column(
             modifier = Modifier
                 .padding(contentPadding)
@@ -102,10 +110,21 @@ private fun PostDetailsScreen(
                     showFullPost = true,
                     onPostClick = {},
                     onReactionAction = onReactionAction,
-                    onMediaClick = onNavigateToMediaViewer
+                    onMediaClick = onNavigateToMediaViewer,
+                    onCommentClick = {
+                        commentsPostId = post.id
+                    }
                 )
 
             }
+        }
+
+        commentsPostId?.let { postId ->
+            CommentsSheet(
+                postId = postId,
+                onDismiss = { commentsPostId = null },
+                onCommentSent = { /* soma +1 na contagem do post, ver nota abaixo */ },
+            )
         }
     }
 }

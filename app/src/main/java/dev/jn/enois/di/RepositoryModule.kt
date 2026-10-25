@@ -1,10 +1,12 @@
 package dev.jn.enois.di
 
 import dev.jn.enois.data.repository.AuthRepositoryImpl
+import dev.jn.enois.data.repository.CommentRepositoryImpl
 import dev.jn.enois.data.repository.FeedRepositoryImpl
 import dev.jn.enois.data.repository.MediaRepositoryImpl
 import dev.jn.enois.data.repository.ReactionRepositoryImpl
 import dev.jn.enois.data.repository.UserProfileRepositoryImpl
+import dev.jn.enois.domain.model.CommentRepository
 import dev.jn.enois.domain.repository.AuthRepository
 import dev.jn.enois.domain.repository.FeedRepository
 import dev.jn.enois.domain.repository.MediaRepository
@@ -32,4 +34,7 @@ val repositoryModule = module {
     single<ReactionRepository> {
         ReactionRepositoryImpl(get(), get())
     }
+
+    single<CommentRepository> { CommentRepositoryImpl(get()) }
+
 }

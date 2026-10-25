@@ -2,6 +2,7 @@ package dev.jn.enois.di
 
 import dev.jn.enois.BuildConfig
 import dev.jn.enois.data.remote.api.AuthApi
+import dev.jn.enois.data.remote.api.CommentApi
 import dev.jn.enois.data.remote.api.FeedApi
 import dev.jn.enois.data.remote.api.MediaApi
 import dev.jn.enois.data.remote.api.ReactionApi
@@ -55,4 +56,5 @@ val networkModule = module {
     singleOf(::UserProfileApi)
     singleOf(::MediaApi)
     singleOf(::ReactionApi)
+    singleOf(::CommentApi)
 }
