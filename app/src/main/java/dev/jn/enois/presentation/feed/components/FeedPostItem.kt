@@ -13,7 +13,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -28,12 +27,11 @@ import dev.jn.enois.domain.model.ReactionSummary
 import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.presentation.components.avatar.UserAvatar
 import dev.jn.enois.presentation.components.badge.UserBadges
+import dev.jn.enois.presentation.components.richtext.CollapsibleRichText
 import dev.jn.enois.presentation.media.MediaUiState
 import dev.jn.enois.presentation.reactions.PostReactionsState
 import dev.jn.enois.presentation.reactions.ReactionAction
 
-private const val POST_COMPACT_THRESHOLD = 400
-private const val POST_MAX_LINES = 15
 
 @Composable
 fun FeedPostItem(
@@ -85,9 +83,6 @@ fun FeedPostItemContent(
     showFullPost: Boolean = false,
 ) {
 
-    val isCompact = !showFullPost &&
-            post.content.length > POST_COMPACT_THRESHOLD
-
     val badges = remember(post) {
         post.getBadges()
     }
@@ -116,21 +111,12 @@ fun FeedPostItemContent(
                 badges = badges,
                 formattedTime = formattedTime
             )
-            Text(
-                text = post.content,
-                maxLines = if (isCompact) {
-                    POST_MAX_LINES
-                } else {
-                    Int.MAX_VALUE
-                },
-                overflow = TextOverflow.Ellipsis
-            )
 
-            if (isCompact) {
-                TextButton(onClick = onPostClick) {
-                    Text("Ler mais")
-                }
-            }
+            CollapsibleRichText(
+                content = post.content,
+                key = post.id,
+                onMention = {},
+            )
 
             PostMediaGrid(
                 mediaIds = post.mediaIds,
