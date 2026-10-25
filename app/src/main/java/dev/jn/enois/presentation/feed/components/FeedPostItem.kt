@@ -2,6 +2,7 @@ package dev.jn.enois.presentation.feed.components
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -95,6 +96,7 @@ fun FeedPostItemContent(
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize()
             .postSharedBounds(
                 postId = post.id,
                 sharedTransitionScope = LocalSharedTransitionScope.current,
@@ -152,6 +154,13 @@ fun FeedPostItemContent(
 
             HorizontalDivider()
 
+            PostActions(
+                postId = post.id,
+                userReaction = reactionState.userReaction,
+                reactionPending = reactionState.isPending,
+                onAction = onReactionAction,
+                onCommentClick = {}
+            )
         }
     }
 
