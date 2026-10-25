@@ -8,31 +8,28 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import kotlin.io.path.Path
 
-internal val CommentAvatarSize = 36.dp        // use o mesmo valor no avatar do CommentItem
+internal val CommentAvatarSize = 36.dp
 internal val CommentItemVerticalPadding = 6.dp
-internal val ReplyIndent = 46.dp              // avatar + espaçamento (36 + 10)
+internal val ReplyIndent = 46.dp
 
 internal enum class ThreadLine { None, RootWithReplies, Reply, LastReply }
 
 internal fun Modifier.threadLine(kind: ThreadLine, color: Color): Modifier =
     if (kind == ThreadLine.None) this else drawBehind {
         val stroke = 2.dp.toPx()
-        val x = (CommentAvatarSize / 2).toPx()                      // centro do avatar da raiz
-        val elbowY = (CommentItemVerticalPadding + CommentAvatarSize / 2).toPx()  // centro do avatar da resposta
+        val x = (CommentAvatarSize / 2).toPx()
+        val elbowY = (CommentItemVerticalPadding + CommentAvatarSize / 2).toPx()
         val radius = 12.dp.toPx()
         val elbowEndX = ReplyIndent.toPx() - 4.dp.toPx()
 
         when (kind) {
             ThreadLine.RootWithReplies -> {
-                // sai de baixo do avatar da raiz e desce até o fim do item
                 val startY = (CommentItemVerticalPadding + CommentAvatarSize + 4.dp).toPx()
                 drawLine(color, Offset(x, startY), Offset(x, size.height), strokeWidth = stroke)
             }
 
             ThreadLine.Reply, ThreadLine.LastReply -> {
-                // a última resposta para no cotovelo; as outras continuam descendo
                 val lineEnd = if (kind == ThreadLine.LastReply) elbowY - radius else size.height
                 drawLine(color, Offset(x, 0f), Offset(x, lineEnd), strokeWidth = stroke)
 
