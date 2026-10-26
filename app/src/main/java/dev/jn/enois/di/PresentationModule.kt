@@ -3,6 +3,7 @@ package dev.jn.enois.di
 import dev.jn.enois.app.navigation.SessionViewModel
 import dev.jn.enois.presentation.auth.login.LoginViewModel
 import dev.jn.enois.presentation.auth.register.RegisterViewModel
+import dev.jn.enois.presentation.components.comments.CommentsViewModel
 import dev.jn.enois.presentation.feed.FeedViewModel
 import dev.jn.enois.presentation.media.MediaViewModel
 import dev.jn.enois.presentation.postdetails.PostDetailsCache
@@ -19,6 +20,7 @@ val presentationModule = module {
     viewModelOf(::PostDetailsViewModel)
     viewModelOf(::MediaViewModel)
     viewModelOf(::ReactionViewModel)
+    viewModelOf(::CommentsViewModel)
 
     single { PostDetailsCache() }
 }

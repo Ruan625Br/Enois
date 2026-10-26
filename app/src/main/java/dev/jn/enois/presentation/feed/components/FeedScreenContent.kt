@@ -11,7 +11,11 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
@@ -21,6 +25,7 @@ import androidx.paging.compose.itemKey
 import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.domain.model.ReactionSummary
 import dev.jn.enois.domain.model.ReactionType
+import dev.jn.enois.presentation.components.comments.CommentsSheet
 import dev.jn.enois.presentation.media.MediaUiState
 import dev.jn.enois.presentation.reactions.PostReactionsState
 import dev.jn.enois.presentation.reactions.ReactionAction
@@ -45,6 +50,8 @@ fun FeedScreenContent(
             horizontal = 8.dp,
         ) + innerPadding
     }
+    var commentsPostId by rememberSaveable { mutableStateOf<String?>(null) }
+
 
     Box(
         modifier = modifier
@@ -79,7 +86,10 @@ fun FeedScreenContent(
                         },
                         onPostClick = { onNavigateToPostDetails(post) },
                         onMediaClick = { onNavigateToMediaViewer(it) },
-                        onReactionAction = onReactionAction
+                        onReactionAction = onReactionAction,
+                        onCommentClick = {
+                            commentsPostId = post.id
+                        }
                     )
                 }
             }
@@ -101,6 +111,14 @@ fun FeedScreenContent(
                     else -> Unit
                 }
             }
+        }
+
+        commentsPostId?.let { postId ->
+            CommentsSheet(
+                postId = postId,
+                onDismiss = { commentsPostId = null },
+                onCommentSent = { /* soma +1 na contagem do post, ver nota abaixo */ },
+            )
         }
 
     }

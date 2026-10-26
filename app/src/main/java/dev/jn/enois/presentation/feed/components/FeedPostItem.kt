@@ -2,6 +2,7 @@ package dev.jn.enois.presentation.feed.components
 
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ fun FeedPostItem(
     onPostClick: () -> Unit,
     onMediaClick: (String) -> Unit,
     onReactionAction: (ReactionAction) -> Unit,
+    onCommentClick: () -> Unit,
     mediaUiState: MediaUiState,
     reactionState: PostReactionsState,
     onLoadMedia: (List<String>) -> Unit,
@@ -58,6 +60,7 @@ fun FeedPostItem(
         onPostClick = onPostClick,
         onMediaClick = onMediaClick,
         onReactionAction = onReactionAction,
+        onCommentClick = onCommentClick,
         mediaUiState = mediaUiState,
         reactionState = reactionState,
         onLoadMedia = onLoadMedia,
@@ -72,6 +75,7 @@ fun FeedPostItemContent(
     onPostClick: () -> Unit,
     onMediaClick: (String) -> Unit,
     onReactionAction: (ReactionAction) -> Unit,
+    onCommentClick: () -> Unit,
     mediaUiState: MediaUiState,
     reactionState: PostReactionsState,
     onLoadMedia: (List<String>) -> Unit,
@@ -90,6 +94,7 @@ fun FeedPostItemContent(
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize()
             .postSharedBounds(
                 postId = post.id,
                 sharedTransitionScope = LocalSharedTransitionScope.current,
@@ -122,22 +127,33 @@ fun FeedPostItemContent(
                 }
             )
 
-            ReactionSummary(
-                summary = reactionState.summary,
-                userReaction = reactionState.userReaction,
-                reactionPending = reactionState.isPending,
-                onReactionClick = {
-                    onReactionAction(
-                        ReactionAction.Click(
-                            postId = post.id,
-                            type = it
+
+            Column {
+                ReactionSummary(
+                    summary = reactionState.summary,
+                    userReaction = reactionState.userReaction,
+                    reactionPending = reactionState.isPending,
+                    onReactionClick = {
+                        onReactionAction(
+                            ReactionAction.Click(
+                                postId = post.id,
+                                type = it
+                            )
                         )
-                    )
-                }
-            )
+                    }
+                )
 
-            HorizontalDivider()
+                HorizontalDivider()
 
+                PostActions(
+                    postId = post.id,
+                    userReaction = reactionState.userReaction,
+                    reactionPending = reactionState.isPending,
+                    counters = post.counters,
+                    onAction = onReactionAction,
+                    onCommentClick = onCommentClick
+                )
+            }
         }
     }
 
