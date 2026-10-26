@@ -1,5 +1,7 @@
 package dev.jn.enois.domain.model
 
+import android.util.Log
+
 enum class AvatarFrameType(
     val fxName: String,
     val isFx: Boolean = false,
@@ -24,7 +26,11 @@ enum class AvatarFrameType(
 
 
         fun fromFxName(fxName: String?): AvatarFrameType? {
-            return BY_FX_NAME[fxName]
+            val frame = BY_FX_NAME[fxName]
+            if (frame == null) {
+                Log.w("AvatarFrameType", "Unknown frame: $fxName")
+            }
+            return frame
         }
     }
 }
