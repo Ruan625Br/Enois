@@ -54,7 +54,7 @@ fun PostDetailsToolbar(
 }
 
 @Composable
-private fun ToolbarBackButton(
+fun ToolbarBackButton(
     onBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {

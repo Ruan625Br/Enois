@@ -3,6 +3,9 @@ package dev.jn.enois.app.navigation
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,22 +21,33 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
+import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
+import androidx.navigation3.scene.Scene
 import androidx.navigation3.ui.NavDisplay
+import androidx.navigation3.ui.defaultPopTransitionSpec
+import androidx.navigation3.ui.defaultTransitionSpec
 import dev.jn.enois.domain.model.SessionState
 import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.presentation.auth.login.LoginRoute
 import dev.jn.enois.presentation.auth.register.RegisterRoute
+import dev.jn.enois.presentation.chat.list.ConversationsRoute
+import dev.jn.enois.presentation.chat.thread.ChatRoute
 import dev.jn.enois.presentation.components.richtext.ProvideEmotes
 import dev.jn.enois.presentation.feed.FeedRoute
-import dev.jn.enois.presentation.postdetails.PostDetailRoute
-import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
-import dev.jn.enois.presentation.chat.ChatRoute
 import dev.jn.enois.presentation.media.viewer.MediaViewerRoute
 import dev.jn.enois.presentation.postdetails.PostDetailRoute
 import org.koin.androidx.compose.koinViewModel
+
+
+private const val TRANSITION_KIND = "enois.transition.kind"
+private val SharedElementMeta = mapOf<String, Any>(TRANSITION_KIND to "shared")
+private val SlideMeta = mapOf<String, Any>(TRANSITION_KIND to "slide")
+
+private fun Scene<NavKey>.kind(): Any? =
+    entries.lastOrNull()?.metadata?.get(TRANSITION_KIND)
 
 @Composable
 fun MainNavigation(modifier: Modifier = Modifier) {
@@ -42,6 +56,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
     val sessionState by sessionViewModel.state.collectAsState()
     val emotes by sessionViewModel.emotes.collectAsStateWithLifecycle()
     val backStack = rememberNavBackStack(AppScreen.SplashScreen)
+
 
     LaunchedEffect(sessionState) {
         val destination = when (sessionState) {
@@ -79,11 +94,46 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                                 backStack.removeAt(backStack.lastIndex)
                             }
                         },
-                        popTransitionSpec = {
-                            EnterTransition.None togetherWith ExitTransition.None
+                        transitionSpec = {
+                            when (targetState.kind()) {
+                                "shared" -> EnterTransition.None togetherWith ExitTransition.None
+                                "slide" -> slideInHorizontally(
+                                    initialOffsetX = { it },
+                                    animationSpec = tween(300)
+                                ) togetherWith slideOutHorizontally(
+                                    targetOffsetX = { -it / 4 },
+                                    animationSpec = tween(300)
+                                )
+
+                                else -> defaultTransitionSpec<NavKey>().invoke(this)
+                            }
                         },
-                        predictivePopTransitionSpec = {
-                            EnterTransition.None togetherWith ExitTransition.None
+                        popTransitionSpec = {
+                            when (initialState.kind()) {
+                                "shared" -> EnterTransition.None togetherWith ExitTransition.None
+                                "slide" -> slideInHorizontally(
+                                    initialOffsetX = { -it / 4 },
+                                    animationSpec = tween(300)
+                                ) togetherWith slideOutHorizontally(
+                                    targetOffsetX = { it },
+                                    animationSpec = tween(300)
+                                )
+
+                                else -> defaultPopTransitionSpec<NavKey>().invoke(this)
+                            }
+                        },
+                        predictivePopTransitionSpec = { swipeEdge ->
+                            when (initialState.kind()) {
+                                "slide" -> slideInHorizontally(
+                                    initialOffsetX = { -it / 4 },
+                                    animationSpec = tween(300)
+                                ) togetherWith slideOutHorizontally(
+                                    targetOffsetX = { it },
+                                    animationSpec = tween(300)
+                                )
+
+                                else -> EnterTransition.None togetherWith ExitTransition.None
+                            }
                         },
                         entryDecorators = listOf(
                             rememberSaveableStateHolderNavEntryDecorator(),
@@ -120,33 +170,54 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                                     },
                                     onNavigateToMediaViewer = { mediaId ->
                                         backStack.add(AppScreen.MediaViewer(mediaId))
+                                    },
+                                    onNavigateToConversations = {
+                                        backStack.add(AppScreen.ConversationsScreen)
                                     }
                                 )
                             }
 
-                        entry<AppScreen.PostDetailsScreen> { key ->
-                            PostDetailRoute(
-                                postId = key.postId,
+                        entry<AppScreen.PostDetailsScreen>(metadata = SharedElementMeta) { key ->
+                                PostDetailRoute(
+                                    postId = key.postId,
+                                    onBack = {
+                                        backStack.removeLastOrNull()
+                                    },
+                                    onNavigateToMediaViewer = { mediaId ->
+                                        backStack.add(AppScreen.MediaViewer(mediaId))
+                                    }
+                                )
+                            }
+
+                        entry<AppScreen.MediaViewer>(metadata = SharedElementMeta) { key ->
+                                MediaViewerRoute(
+                                    mediaId = key.mediaId
+                                )
+                            }
+
+                        entry<AppScreen.ChatScreen>(metadata = SlideMeta) { key ->
+                            ChatRoute(
+                                conversationId = key.conversationId,
                                 onBack = {
                                     backStack.removeLastOrNull()
-                                },
-                                onNavigateToMediaViewer = { mediaId ->
-                                    backStack.add(AppScreen.MediaViewer(mediaId))
                                 }
                             )
                         }
 
-                        entry<AppScreen.MediaViewer> { key ->
-                            MediaViewerRoute(
-                                mediaId = key.mediaId
+                        entry<AppScreen.ConversationsScreen>(metadata = SlideMeta) {
+                            ConversationsRoute(
+                                onBack = {
+                                    backStack.removeLastOrNull()
+                                },
+                                openConversation = { conversationId ->
+                                    backStack.add(AppScreen.ChatScreen(conversationId))
+                                }
                             )
+                            }
                         }
-
-                        entry<AppScreen.ChatScreen> {
-                            ChatRoute()
-                        }
-                    }
-                )
+                    )
+                }
+                }
             }
         }
     }

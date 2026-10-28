@@ -18,6 +18,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import dev.jn.enois.domain.model.FeedPost
@@ -39,6 +40,7 @@ import org.koin.androidx.compose.koinViewModel
 fun FeedRoute(
     onNavigateToPostDetails: (String) -> Unit,
     onNavigateToMediaViewer: (String) -> Unit,
+    onNavigateToConversations: () -> Unit,
     modifier: Modifier = Modifier,
     feedViewModel: FeedViewModel = koinViewModel(),
     mediaViewModel: MediaViewModel = koinViewModel(),
@@ -60,6 +62,7 @@ fun FeedRoute(
             onNavigateToPostDetails(post.id)
         },
         onNavigateToMediaViewer = onNavigateToMediaViewer,
+        onNavigateToConversations = onNavigateToConversations,
         onLoadMedia = mediaViewModel::loadMedia,
         onProvideReactionSummary = reactionViewModel::provideFeedSummary,
         onReactionAction = reactionViewModel::onReactionAction,
@@ -78,6 +81,7 @@ private fun FeedScreen(
     posts: LazyPagingItems<FeedPost>,
     onNavigateToPostDetails: (FeedPost) -> Unit,
     onNavigateToMediaViewer: (String) -> Unit,
+    onNavigateToConversations: () -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -101,10 +105,13 @@ private fun FeedScreen(
             .collect { toolbarOffsetPx = 0f }
     }
 
+    val navScope = LocalNavAnimatedContentScope.current
+    val transitionRunning = navScope.transition.currentState != navScope.transition.targetState
+
+
     ProvideAvatarFxClock(
-        paused = { listState.isScrollInProgress }) {
-
-
+        paused = { listState.isScrollInProgress || transitionRunning }
+    ) {
         Scaffold(
             modifier = modifier.nestedScroll(scrollConnection),
             topBar = {
@@ -118,7 +125,8 @@ private fun FeedScreen(
                         },
                 ) {
                     FeedToolbar(
-                        userProfile = feedUiState.userProfile
+                        userProfile = feedUiState.userProfile,
+                        onConversationClick = onNavigateToConversations
                     )
                 }
             },

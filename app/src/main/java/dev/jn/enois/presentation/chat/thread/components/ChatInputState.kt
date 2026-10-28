@@ -1,4 +1,4 @@
-package dev.jn.enois.presentation.chat.components
+package dev.jn.enois.presentation.chat.thread.components
 
 import android.net.Uri
 import androidx.compose.foundation.text.input.TextFieldState

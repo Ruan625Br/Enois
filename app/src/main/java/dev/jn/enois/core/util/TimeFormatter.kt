@@ -1,31 +1,26 @@
 package dev.jn.enois.core.util
 
-import android.annotation.SuppressLint
-import java.time.Duration
 import java.time.Instant
-import java.time.OffsetDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-@SuppressLint("NewApi")
 fun formatTime(iso: String?): String {
-    if (iso.isNullOrBlank()) return ""
-
-    val date = runCatching {
-        runCatching { Instant.parse(iso) }
-            .getOrElse { OffsetDateTime.parse(iso).toInstant() }
-    }.getOrNull() ?: return ""
-
-    val diffMinutes = Duration.between(date, Instant.now()).toMinutes()
+    val millis = parseIsoMillis(iso) ?: return ""
+    val diffMinutes = (System.currentTimeMillis() - millis) / 60_000
 
     return when {
-        diffMinutes < 1 -> "Agora"
-        diffMinutes < 60 -> "$diffMinutes min atrás"
-        diffMinutes < 1440 -> "${diffMinutes / 60} h atrás"
-        diffMinutes < 10080 -> "${diffMinutes / 1440} d atrás"
+        diffMinutes < 1 -> "agora"
+        diffMinutes < 60 -> "há $diffMinutes min"
+        diffMinutes < 1440 -> "há ${diffMinutes / 60} h"
+        diffMinutes < 10080 -> {
+            val days = diffMinutes / 1440
+            "há $days ${if (days == 1L) "dia" else "dias"}"
+        }
+
         else -> DateTimeFormatter
-            .ofPattern("dd/MM/yyyy", Locale("pt", "BR"))
-            .withZone(java.time.ZoneId.of("America/Sao_Paulo"))
-            .format(date)
+            .ofPattern("dd/MM/yyyy", Locale.forLanguageTag("pt-BR"))
+            .withZone(ZoneId.of("America/Sao_Paulo"))
+            .format(Instant.ofEpochMilli(millis))
     }
 }

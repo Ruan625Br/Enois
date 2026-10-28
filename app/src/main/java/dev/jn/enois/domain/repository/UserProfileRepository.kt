@@ -5,4 +5,6 @@ import dev.jn.enois.domain.model.UserProfile
 interface UserProfileRepository {
 
     suspend fun getCurrentProfile(): Result<UserProfile>
+
+    suspend fun getProfileById(id: String): Result<UserProfile>
 }
