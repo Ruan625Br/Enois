@@ -22,5 +22,7 @@ sealed interface AppScreen : NavKey {
     data class MediaViewer(val mediaId: String) : AppScreen
 
     @Serializable
-    data object ChatScreen : AppScreen
+    data class ChatScreen(val conversationId: String) : AppScreen
+    @Serializable
+    data object ConversationsScreen : AppScreen
 }

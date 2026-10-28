@@ -1,12 +1,15 @@
 package dev.jn.enois.domain.model
 
+import androidx.compose.runtime.Stable
 
+
+@Stable
 data class UserProfile(
     val id: String,
     val username: String,
     val name: String,
     val headline: String?,
-    val email: String,
+    val email: String?,
     val company: String?,
     val location: String?,
     val avatar: String?,

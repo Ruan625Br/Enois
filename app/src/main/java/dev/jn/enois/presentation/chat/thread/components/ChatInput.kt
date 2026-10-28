@@ -1,4 +1,4 @@
-package dev.jn.enois.presentation.chat.components
+package dev.jn.enois.presentation.chat.thread.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.clearText
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -46,7 +47,9 @@ import dev.jn.enois.ui.icons.AppIcons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ChatInput(modifier: Modifier = Modifier) {
+fun ChatInput(
+    onSend: (String) -> Unit,
+    modifier: Modifier = Modifier) {
 
     var showPicker by remember { mutableStateOf(false) }
 
@@ -61,7 +64,9 @@ fun ChatInput(modifier: Modifier = Modifier) {
             onClick = { showPicker = true },
         )
 
-        ChatTextField()
+        ChatTextField(
+            onSendClick = onSend,
+        )
     }
 
     if (showPicker) {
@@ -106,7 +111,9 @@ private fun ChatAddButton(
 }
 
 @Composable
-fun RowScope.ChatTextField(modifier: Modifier = Modifier) {
+fun RowScope.ChatTextField(
+    onSendClick: (String) -> Unit,
+    modifier: Modifier = Modifier) {
     val state = rememberChatInputState()
     val activeTextState = state.textContent
 
@@ -178,7 +185,13 @@ fun RowScope.ChatTextField(modifier: Modifier = Modifier) {
                         Surface(
                             modifier = Modifier
                                 .size(36.dp),
-                            onClick = {},
+                            onClick = {
+                                val text = state.textContent.text.toString()
+                                if (text.isNotBlank()) {
+                                    onSendClick(text)
+                                    state.textContent.clearText()
+                                }
+                            },
                             shape = CircleShape,
                             color = MaterialTheme.colorScheme.primary
                         ) {
@@ -186,7 +199,6 @@ fun RowScope.ChatTextField(modifier: Modifier = Modifier) {
                                 contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
-
                                     imageVector = AppIcons.ArrowUpward,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.onPrimary,

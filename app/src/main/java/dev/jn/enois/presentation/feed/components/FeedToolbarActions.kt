@@ -33,6 +33,7 @@ import dev.jn.enois.ui.icons.AppIcons
 @Composable
 fun FeedToolbarActions(
     userProfile: UserProfile?,
+    onConversationClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val buttonShape = RoundedCornerShape(50)
@@ -84,7 +85,7 @@ fun FeedToolbarActions(
                 FeedToolbarIconButton(
                     icon = AppIcons.Inbox,
                     size = topPillSize,
-                    onClick = {}
+                    onClick = onConversationClick
                 )
 
                 if (userProfile != null) {

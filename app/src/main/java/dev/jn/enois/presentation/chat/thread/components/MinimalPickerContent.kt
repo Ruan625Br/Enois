@@ -1,4 +1,4 @@
-package dev.jn.enois.presentation.chat.components
+package dev.jn.enois.presentation.chat.thread.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
