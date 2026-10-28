@@ -10,9 +10,7 @@ class MediaApi(
     private val client: HttpClient
 ) {
 
-    suspend fun getMedia(id: String, token: String): MediaDto {
-        return client.get("media/$id") {
-            header("X-Session-Token", token)
-        }.body()
+    suspend fun getMedia(id: String): MediaDto {
+        return client.get("media/$id").body()
     }
 }

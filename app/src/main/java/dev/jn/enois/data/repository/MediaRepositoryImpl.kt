@@ -1,6 +1,5 @@
 package dev.jn.enois.data.repository
 
-import dev.jn.enois.data.local.session.TokenStorage
 import dev.jn.enois.data.mapper.toDomain
 import dev.jn.enois.data.remote.api.MediaApi
 import dev.jn.enois.data.remote.dto.media.MediaDto
@@ -14,8 +13,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlin.coroutines.cancellation.CancellationException
 
 class MediaRepositoryImpl(
-    private val mediaApi: MediaApi,
-    private val tokenStorage: TokenStorage
+    private val mediaApi: MediaApi
 ) : MediaRepository {
 
     private val mutex = Mutex()
@@ -24,8 +22,6 @@ class MediaRepositoryImpl(
     override suspend fun getMedia(id: String): Result<Media> {
         return try {
             val now = System.currentTimeMillis()
-            val tokens = tokenStorage.getTokens()
-                ?: error("No authenticated session")
 
             val cached = mutex.withLock {
                 cache[id]?.takeIf {
@@ -37,7 +33,7 @@ class MediaRepositoryImpl(
                 return Result.success(cached.toDomain())
             }
 
-            val media = mediaApi.getMedia(id, tokens.accessToken)
+            val media = mediaApi.getMedia(id)
 
             mutex.withLock {
                 cache[id] = CacheEntry(
