@@ -16,7 +16,12 @@ enum class AvatarFrameType(
 
     AURORA("moldura-aurora"),
     PULSAR("moldura-pulsar"),
-    SOLAR("moldura-solar");
+    SOLAR("moldura-solar"),
+    NEBULA("moldura-nebulosa", isFx = true),
+    SUPERNOVA("moldura-supernova", isFx = true),
+    GALAXIA("moldura-galaxia", isFx = true),
+    PORTAL("moldura-portal", isFx = true),
+    HOLOGRAM("moldura-holograma", isFx = true);
 
     companion object {
         private val BY_FX_NAME: Map<String, AvatarFrameType> = entries.associateBy { it.fxName }
