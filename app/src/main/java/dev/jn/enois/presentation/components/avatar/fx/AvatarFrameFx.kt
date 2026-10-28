@@ -15,6 +15,9 @@ import dev.jn.enois.domain.model.AvatarFrameType
 @Composable
 fun AvatarFrameFx(frame: AvatarFrameType, modifier: Modifier = Modifier) {
     val clock = LocalAvatarFxClock.current ?: rememberFreeRunningClock()
+    val still = false
+    val galaxia = if (frame == AvatarFrameType.GALAXIA) rememberGalaxiaImages() else null
+
 
     Canvas(modifier) {
         val t = clock.floatValue
@@ -33,6 +36,11 @@ fun AvatarFrameFx(frame: AvatarFrameType, modifier: Modifier = Modifier) {
                 AvatarFrameType.ORBIT -> drawOrbit(t)
                 AvatarFrameType.GLACIAL -> drawGlacial(t)
                 AvatarFrameType.TOXIC -> drawToxic(t)
+                AvatarFrameType.HOLOGRAM -> drawHologram(t)
+                AvatarFrameType.NEBULA -> drawNebula(t, still)
+                AvatarFrameType.SUPERNOVA -> drawSupernova(t, still)
+                AvatarFrameType.PORTAL -> drawPortal(t, still)
+                AvatarFrameType.GALAXIA -> galaxia?.let { drawGalaxia(t, it, still) }
             }
         }
     }
