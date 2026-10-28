@@ -20,19 +20,19 @@ val repositoryModule = module {
     }
 
     single<FeedRepository> {
-        FeedRepositoryImpl(get(), get())
+        FeedRepositoryImpl(get())
     }
 
     single<UserProfileRepository> {
-        UserProfileRepositoryImpl(get(), get())
+        UserProfileRepositoryImpl(get())
     }
 
     single<MediaRepository> {
-        MediaRepositoryImpl(get(), get())
+        MediaRepositoryImpl(get())
     }
 
     single<ReactionRepository> {
-        ReactionRepositoryImpl(get(), get())
+        ReactionRepositoryImpl(get())
     }
 
     single<CommentRepository> { CommentRepositoryImpl(get()) }

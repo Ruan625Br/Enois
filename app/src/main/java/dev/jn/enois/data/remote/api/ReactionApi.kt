@@ -16,25 +16,20 @@ class ReactionApi(
     private val client: HttpClient
 ) {
 
-    suspend fun react(postId: String, request: ReactionRequest, token: String): PostActionDto {
+    suspend fun react(postId: String, request: ReactionRequest): PostActionDto {
         return client.post("feed/posts/$postId/reactions") {
             header("Idempotency-Key", UUID.randomUUID().toString())
-            header("X-Session-Token", token)
-
             setBody(request)
         }.body()
     }
 
-    suspend fun removeReaction(postId: String, token: String): PostActionDto {
+    suspend fun removeReaction(postId: String): PostActionDto {
         return client.delete("feed/posts/$postId/reactions") {
             header("Idempotency-Key", UUID.randomUUID().toString())
-            header("X-Session-Token", token)
         }.body()
     }
 
-    suspend fun getReactions(postId: String, token: String): ReactionListResponseDto {
-        return client.get("feed/posts/$postId/reactions") {
-            header("X-Session-Token", token)
-        }.body()
+    suspend fun getReactions(postId: String): ReactionListResponseDto {
+        return client.get("feed/posts/$postId/reactions").body()
     }
 }

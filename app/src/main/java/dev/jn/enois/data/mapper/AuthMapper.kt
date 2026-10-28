@@ -8,8 +8,8 @@ import dev.jn.enois.domain.model.AuthSession
 fun AuthResponse.toDomain(): AuthSession =
     AuthSession(
         user = user.toDomain(),
-        accessToken = token,
-        refreshToken = refreshToken,
+        accessToken = "no-token",
+        refreshToken = "no-token-re",
         expiresAt = expiresAt,
         refreshExpiresAt = refreshExpiresAt
     )

@@ -1,6 +1,5 @@
 package dev.jn.enois.data.repository
 
-import dev.jn.enois.data.local.session.TokenStorage
 import dev.jn.enois.data.mapper.toDomain
 import dev.jn.enois.data.remote.api.ReactionApi
 import dev.jn.enois.data.remote.dto.reaction.ReactionRequest
@@ -11,8 +10,7 @@ import dev.jn.enois.domain.repository.ReactionRepository
 import kotlin.coroutines.cancellation.CancellationException
 
 class ReactionRepositoryImpl(
-    private val reactionApi: ReactionApi,
-    private val tokenStorage: TokenStorage
+    private val reactionApi: ReactionApi
 ) : ReactionRepository {
 
     override suspend fun addReaction(
@@ -20,11 +18,9 @@ class ReactionRepositoryImpl(
         type: ReactionType
     ): Result<PostAction> {
         return try {
-            val tokens = tokenStorage.getTokens()
-                ?: error("No authenticated session")
 
             val request = ReactionRequest(type)
-            val response = reactionApi.react(postId, request, tokens.accessToken)
+            val response = reactionApi.react(postId, request)
 
             Result.success(response.toDomain())
         } catch (e: CancellationException) {
@@ -36,10 +32,7 @@ class ReactionRepositoryImpl(
 
     override suspend fun removeReaction(postId: String): Result<PostAction> {
         return try {
-            val tokens = tokenStorage.getTokens()
-                ?: error("No authenticated session")
-
-            val response = reactionApi.removeReaction(postId, tokens.accessToken)
+            val response = reactionApi.removeReaction(postId)
 
             Result.success(response.toDomain())
         } catch (e: CancellationException) {
@@ -51,10 +44,7 @@ class ReactionRepositoryImpl(
 
     override suspend fun getReactions(postId: String): Result<ReactionList> {
         return try {
-            val tokens = tokenStorage.getTokens()
-                ?: error("No authenticated session")
-
-            val response = reactionApi.getReactions(postId, tokens.accessToken)
+            val response = reactionApi.getReactions(postId)
 
             Result.success(response.toDomain())
         } catch (e: CancellationException) {

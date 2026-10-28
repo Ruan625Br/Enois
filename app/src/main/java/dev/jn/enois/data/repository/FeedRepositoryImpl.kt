@@ -1,6 +1,5 @@
 package dev.jn.enois.data.repository
 
-import dev.jn.enois.data.local.session.TokenStorage
 import dev.jn.enois.data.mapper.toDomain
 import dev.jn.enois.data.remote.api.FeedApi
 import dev.jn.enois.domain.model.FeedPage
@@ -11,7 +10,6 @@ import kotlin.coroutines.cancellation.CancellationException
 
 class FeedRepositoryImpl(
     private val feedApi: FeedApi,
-    private val tokenStorage: TokenStorage
 ) : FeedRepository {
 
     override suspend fun getFeed(
@@ -20,11 +18,7 @@ class FeedRepositoryImpl(
         limit: Int
     ): Result<FeedPage> {
         return try {
-            val tokens = tokenStorage.getTokens()
-                ?: error("No authenticated session")
-
             val response = feedApi.getFeed(
-                token = tokens.accessToken,
                 tab = tab.name,
                 cursor = cursor,
                 limit = limit
@@ -40,11 +34,7 @@ class FeedRepositoryImpl(
 
     override suspend fun getPost(postId: String): Result<FeedPost> {
         return try {
-            val tokens = tokenStorage.getTokens()
-                ?: error("No authenticated session")
-
             val response = feedApi.getPost(
-                token = tokens.accessToken,
                 postId = postId
             )
 
