@@ -28,5 +28,8 @@ enum class ReactionType(val emoji: String) {
             val trimmed = value.trim()
             return BY_NAME[trimmed.lowercase()] ?: BY_EMOJI[trimmed]
         }
+
+        fun fromKey(key: String): ReactionType? =
+            entries.firstOrNull { it.name.equals(key, ignoreCase = true) }
     }
 }

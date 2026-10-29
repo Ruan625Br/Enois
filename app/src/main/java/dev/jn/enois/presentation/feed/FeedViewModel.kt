@@ -10,26 +10,34 @@ import dev.jn.enois.data.pading.FeedPagingSource
 import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.domain.model.FeedTab
 import dev.jn.enois.domain.repository.FeedRepository
-import dev.jn.enois.domain.repository.UserProfileRepository
 import dev.jn.enois.presentation.postdetails.PostDetailsCache
+import dev.jn.enois.presentation.profile.CurrentUserStore
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @Stable
 class FeedViewModel(
     private val feedRepository: FeedRepository,
-    private val userProfileRepository: UserProfileRepository,
+    private val currentUser: CurrentUserStore,
     private val postDetailsCache: PostDetailsCache
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(FeedUiState())
-    val uiState = _uiState.asStateFlow()
+    val uiState = combine(_uiState, currentUser.profile) { state, me ->
+        state.copy(userProfile = me)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5_000),
+        initialValue = _uiState.value.copy(userProfile = currentUser.profile.value),
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val posts = _uiState
@@ -51,23 +59,13 @@ class FeedViewModel(
         .cachedIn(viewModelScope)
 
     init {
-        loadCurrentUserProfile()
+        currentUser.ensureLoaded()
     }
 
     fun onSelectTab(tab: FeedTab) {
         viewModelScope.launch {
             _uiState.update {
                 it.copy(selectedTab = tab)
-            }
-        }
-    }
-
-    private fun loadCurrentUserProfile() = viewModelScope.launch {
-        val result = userProfileRepository.getCurrentProfile()
-
-        result.onSuccess { userProfile ->
-            _uiState.update {
-                it.copy(userProfile = userProfile)
             }
         }
     }

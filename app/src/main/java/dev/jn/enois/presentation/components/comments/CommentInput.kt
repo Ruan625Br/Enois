@@ -146,7 +146,7 @@ fun CommentInput(
                 }
             )
             /*  OutlinedTextField(
-                  state = inputState,
+                  uiState = inputState,
                   modifier = Modifier.weight(1f).focusRequester(focusRequester),
                   placeholder = { Text("Escreva um comentário") },
                   shape = MaterialTheme.shapes.extraLarge,
