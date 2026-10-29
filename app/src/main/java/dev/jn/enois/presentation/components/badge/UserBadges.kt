@@ -16,22 +16,27 @@ import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import coil3.compose.LocalPlatformContext
 import coil3.request.ImageRequest
-import dev.jn.enois.presentation.components.avatar.resolveCdnUrl
 
 @Composable
 fun UserBadges(
     badges: List<String>,
     modifier: Modifier = Modifier,
-    shape: Shape = MaterialTheme.shapes.medium) {
+    shape: Shape = MaterialTheme.shapes.medium,
+    maxBadges: Int = 5
+) {
+
+    val list = remember(badges) { badges.filter { it.isNotBlank() }.take(maxBadges) }
+    if (list.isEmpty()) return
+
 
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(5.dp)
     ) {
-        badges.forEach { badge ->
+        list.forEach { badge ->
             if (badge.isBlank()) return@forEach
             UserBadge(
-                url = badge,
+                badge = badge,
                 shape = shape
             )
         }
@@ -41,19 +46,20 @@ fun UserBadges(
 
 @Composable
 private fun UserBadge(
-    url: String,
+    badge: String,
     shape: Shape,
-    modifier: Modifier = Modifier) {
+    modifier: Modifier = Modifier
+) {
 
     val context = LocalPlatformContext.current
 
-    val urlResolved = remember(url) {
-        resolveCdnUrl(url)
+    val data = remember(badge) {
+        if (isOfficialBadgeId(badge)) officialBadgeAsset(badge) else badge
     }
 
-    val model = remember(context, urlResolved) {
+    val model = remember(context, data) {
         ImageRequest.Builder(context)
-            .data(urlResolved)
+            .data(data)
             .build()
     }
 
@@ -68,7 +74,7 @@ private fun UserBadge(
             modifier = Modifier
                 .fillMaxSize(),
             onError = {
-                Log.e("UseBadge", "Error loading image", it.result.throwable)
+                Log.e("UseBadge", "Error loading image $badge - $data", it.result.throwable)
             }
         )
     }

@@ -48,8 +48,10 @@ fun RichText(
     onMention: (username: String) -> Unit = {},
     inlineMedia: @Composable (mediaId: String) -> Unit = {},
 ) {
-    val ctx =
-        remember(webOrigin, mediaSpoiler, onMention) { RichCtx(webOrigin, mediaSpoiler, onMention) }
+    val emotes = LocalEmotes.current
+    val ctx = remember(webOrigin, mediaSpoiler, onMention, emotes) {
+        RichCtx(webOrigin, mediaSpoiler, onMention, emotes)
+    }
 
     val parts = remember(content, mediaIds.isNotEmpty()) {
         val chunks = if (mediaIds.isNotEmpty()) splitByInlineMedia(content)
@@ -75,7 +77,7 @@ fun RichText(
 
 @Composable
 fun SpoilerMedia(active: Boolean, content: @Composable () -> Unit) {
-    TODO("Not yet implemented")
+    TODO("Not yet implemented SpoilerMedia")
 }
 
 @Composable
