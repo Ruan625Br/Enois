@@ -1,5 +1,6 @@
 package dev.jn.enois.data.remote.dto.message
 
+import dev.jn.enois.domain.model.ReactionType
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -32,7 +33,7 @@ data class MessageDto(
     val mediaSpoiler: Boolean = false,
     val time: String,
     val reactions: Map<String, Int> = emptyMap(),
-    val myReaction: String? = null,
+    val myReaction: ReactionType? = null,
     val e2e: Boolean = false,
     val iv: String? = null,
 )
@@ -40,7 +41,6 @@ data class MessageDto(
 @Serializable
 data class SendMessageRequest(val text: String, val mediaIds: List<String>, val mediaSpoiler: Boolean)
 
-@Serializable data class ReactRequest(val type: String)
-@Serializable data class ReactResponse(val added: Boolean)
+@Serializable data class ReactResponse(val status: String)
 @Serializable data class IdsRequest(val ids: List<String>)
 @Serializable data class OpenDirectRequest(val userId: String)

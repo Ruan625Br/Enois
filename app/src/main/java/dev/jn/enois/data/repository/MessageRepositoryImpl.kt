@@ -8,6 +8,7 @@ import dev.jn.enois.data.remote.dto.message.SendMessageRequest
 import dev.jn.enois.domain.model.Conversation
 import dev.jn.enois.domain.model.CursorPage
 import dev.jn.enois.domain.model.Message
+import dev.jn.enois.domain.model.ReactionType
 import dev.jn.enois.domain.repository.MessageRepository
 import java.util.UUID
 
@@ -44,9 +45,9 @@ class MessageRepositoryImpl(
     override suspend fun react(
         conversationId: String,
         messageId: String,
-        type: String
-    ): Result<Boolean> = apiCall {
-        messageApi.react(conversationId, messageId, type).added
+        type: ReactionType
+    ): Result<String> = apiCall {
+        messageApi.react(conversationId, messageId, type).status
     }
 
     override suspend fun markAsRead(conversationId: String): Result<Unit> = apiCall {

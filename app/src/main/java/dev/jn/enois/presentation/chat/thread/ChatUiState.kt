@@ -6,6 +6,7 @@ import dev.jn.enois.domain.model.Message
 @Stable
 data class ChatUiState(
     val messages: List<Message> = emptyList(),
+    val reactionPendingIds: Set<String> = emptySet(),
     val cursor: String? = null,
     val endReached: Boolean = false,
     val isLoading: Boolean = false,

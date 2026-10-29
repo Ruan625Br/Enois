@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import dev.jn.enois.domain.model.ReactionSummary
 import dev.jn.enois.domain.model.ReactionType
 import dev.jn.enois.domain.repository.ReactionRepository
+import dev.jn.enois.domain.util.withReaction
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -116,22 +117,7 @@ class ReactionViewModel(
         val newReaction = if (remove) null else action.type
 
         val optimisticSummary = current.summary?.let { summary ->
-            val counts = summary.counts.toMutableMap()
-
-            if (previousReaction != null) {
-                val remaining = (counts[previousReaction] ?: 0) - 1
-
-                if (remaining > 0) {
-                    counts[previousReaction] = remaining
-                } else {
-                    counts.remove(previousReaction)
-                }
-            }
-
-            if (newReaction != null) {
-                counts[newReaction] = (counts[newReaction] ?: 0) + 1
-            }
-
+            val counts = summary.counts.withReaction(previousReaction, newReaction)
             ReactionSummary(counts = counts)
         }
 

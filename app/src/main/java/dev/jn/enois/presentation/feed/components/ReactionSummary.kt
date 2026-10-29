@@ -1,12 +1,5 @@
 package dev.jn.enois.presentation.feed.components
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -22,10 +15,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import dev.jn.enois.domain.model.ReactionSummary
 import dev.jn.enois.domain.model.ReactionType
+import dev.jn.enois.presentation.reactions.AnimatedReactionCount
 
 @Composable
 fun ReactionSummary(
@@ -95,38 +88,6 @@ fun ReactionSummary(
     }
 }
 
-@Composable
-private fun AnimatedReactionCount(
-    count: Int,
-    color: Color,
-    modifier: Modifier = Modifier,
-) {
-    AnimatedContent(
-        targetState = count,
-        modifier = modifier,
-        transitionSpec = {
-            val direction = if (targetState > initialState) 1 else -1
-
-            (slideInVertically { height -> direction * height / 2 } +
-                    fadeIn())
-                .togetherWith(
-                    slideOutVertically { height -> -direction * height / 2 } +
-                            fadeOut()
-                )
-                .using(
-                    SizeTransform(clip = false)
-                )
-        },
-        label = "reaction-count",
-    ) { animatedCount ->
-        Text(
-            text = animatedCount.toString(),
-            style = MaterialTheme.typography.labelMedium,
-            maxLines = 1,
-            color = color,
-        )
-    }
-}
 
 private fun stableReactionOrder(
     counts: Map<ReactionType, Int>,
