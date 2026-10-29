@@ -177,7 +177,7 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                                 )
                             }
 
-                        entry<AppScreen.PostDetailsScreen>(metadata = SharedElementMeta) { key ->
+                            entry<AppScreen.PostDetailsScreen>(metadata = SharedElementMeta) { key ->
                                 PostDetailRoute(
                                     postId = key.postId,
                                     onBack = {
@@ -189,34 +189,33 @@ fun MainNavigation(modifier: Modifier = Modifier) {
                                 )
                             }
 
-                        entry<AppScreen.MediaViewer>(metadata = SharedElementMeta) { key ->
+                            entry<AppScreen.MediaViewer>(metadata = SharedElementMeta) { key ->
                                 MediaViewerRoute(
                                     mediaId = key.mediaId
                                 )
                             }
 
-                        entry<AppScreen.ChatScreen>(metadata = SlideMeta) { key ->
-                            ChatRoute(
-                                conversationId = key.conversationId,
-                                onBack = {
-                                    backStack.removeLastOrNull()
-                                }
-                            )
-                        }
+                            entry<AppScreen.ChatScreen>(metadata = SlideMeta) { key ->
+                                ChatRoute(
+                                    conversationId = key.conversationId,
+                                    onBack = {
+                                        backStack.removeLastOrNull()
+                                    }
+                                )
+                            }
 
-                        entry<AppScreen.ConversationsScreen>(metadata = SlideMeta) {
-                            ConversationsRoute(
-                                onBack = {
-                                    backStack.removeLastOrNull()
-                                },
-                                openConversation = { conversationId ->
-                                    backStack.add(AppScreen.ChatScreen(conversationId))
-                                }
-                            )
+                            entry<AppScreen.ConversationsScreen>(metadata = SlideMeta) {
+                                ConversationsRoute(
+                                    onBack = {
+                                        backStack.removeLastOrNull()
+                                    },
+                                    openConversation = { conversationId ->
+                                        backStack.add(AppScreen.ChatScreen(conversationId))
+                                    }
+                                )
                             }
                         }
                     )
-                }
                 }
             }
         }
