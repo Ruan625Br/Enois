@@ -4,16 +4,18 @@ import dev.jn.enois.data.remote.dto.message.ConversationDto
 import dev.jn.enois.data.remote.dto.message.CursorPageDto
 import dev.jn.enois.data.remote.dto.message.MessageDto
 import dev.jn.enois.data.remote.dto.message.OpenDirectRequest
-import dev.jn.enois.data.remote.dto.message.ReactRequest
 import dev.jn.enois.data.remote.dto.message.ReactResponse
 import dev.jn.enois.data.remote.dto.message.SendMessageRequest
+import dev.jn.enois.data.remote.dto.reaction.ReactionRequest
 import dev.jn.enois.data.remote.error.bodyOrThrow
+import dev.jn.enois.domain.model.ReactionType
 import io.ktor.client.HttpClient
 import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import java.util.UUID
 
 class MessageApi(private val client: HttpClient) {
 
@@ -56,13 +58,15 @@ class MessageApi(private val client: HttpClient) {
         }.bodyOrThrow("Falha ao enviar mensagem.")
 
     suspend fun markAsRead(id: String) {
-        return client.post("conversations/$id/read")
-            .bodyOrThrow("Falha ao marcar como lido.")
+        return client.post("conversations/$id/read") {
+            header("Idempotency-Key", UUID.randomUUID().toString())
+        }.bodyOrThrow("Falha ao marcar como lido.")
     }
 
-    suspend fun react(id: String, messageId: String, type: String): ReactResponse =
+    suspend fun react(id: String, messageId: String, type: ReactionType): ReactResponse =
         client.post("conversations/$id/messages/$messageId/reactions") {
-            setBody(ReactRequest(type))
+            header("Idempotency-Key", UUID.randomUUID().toString())
+            setBody(ReactionRequest(type))
         }.bodyOrThrow("Falha ao reagir.")
 
     /*    suspend fun hideConversations(ids: List<String>) {

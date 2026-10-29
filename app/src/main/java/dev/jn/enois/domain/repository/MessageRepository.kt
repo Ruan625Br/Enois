@@ -3,6 +3,7 @@ package dev.jn.enois.domain.repository
 import dev.jn.enois.domain.model.Conversation
 import dev.jn.enois.domain.model.CursorPage
 import dev.jn.enois.domain.model.Message
+import dev.jn.enois.domain.model.ReactionType
 
 interface MessageRepository {
     suspend fun listMessages(
@@ -19,7 +20,7 @@ interface MessageRepository {
         idempotencyKey: String? = null
     ): Result<Message>
 
-    suspend fun react(conversationId: String, messageId: String, type: String): Result<Boolean>
+    suspend fun react(conversationId: String, messageId: String, type: ReactionType): Result<String>
     suspend fun markAsRead(conversationId: String): Result<Unit>
     suspend fun openDirect(userId: String): Result<Conversation>
     suspend fun hideMessages(conversationId: String, ids: List<String>): Result<Unit>

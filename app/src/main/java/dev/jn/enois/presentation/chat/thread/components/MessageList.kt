@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.jn.enois.domain.model.Message
+import dev.jn.enois.domain.model.ReactionType
 import dev.jn.enois.presentation.profile.ProfileState
 import kotlinx.coroutines.flow.Flow
 
@@ -31,10 +32,12 @@ fun MessageList(
     peerLastReadMillis: Long?,
     selecting: Boolean,
     selected: Set<String>,
+    reactionPendingIds: Set<String>,
     isLoading: Boolean,
     onLoadOlder: () -> Unit,
     onToggleSelected: (String) -> Unit,
     onRetry: (String) -> Unit,
+    onReact: (String, ReactionType) -> Unit,
     profileState: (String) -> Flow<ProfileState?>,
     ensureProfile: (String) -> Unit,
     contentPadding: PaddingValues,
@@ -68,7 +71,9 @@ fun MessageList(
                 readByPeer = isMine && peerLastReadMillis != null && m.timeMillis <= peerLastReadMillis,
                 selecting = selecting,
                 selected = m.id in selected,
+                reactionPending = m.id in reactionPendingIds,
                 onClick = { if (selecting) onToggleSelected(m.id) },
+                onReact = { type -> onReact(m.id, type) },
                 onLongClick = { onToggleSelected(m.id) },
                 onRetry = { onRetry(m.id) },
 

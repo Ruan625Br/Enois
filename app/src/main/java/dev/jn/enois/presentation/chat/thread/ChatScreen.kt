@@ -1,7 +1,6 @@
 package dev.jn.enois.presentation.chat.thread
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -12,6 +11,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
+import dev.jn.enois.domain.model.ReactionType
 import dev.jn.enois.domain.model.UserProfile
 import dev.jn.enois.presentation.chat.thread.components.ChatInput
 import dev.jn.enois.presentation.chat.thread.components.ChatToolbar
@@ -74,7 +74,7 @@ private fun ChatScreen(
     onSend: (String) -> Unit,
     onRetry: (String) -> Unit,
     onLoadOlder: () -> Unit,
-    onReact: (String, String) -> Unit,
+    onReact: (String, ReactionType) -> Unit,
     onStartSelecting: () -> Unit,
     onToggleSelected: (String) -> Unit,
     onCancelSelection: () -> Unit,
@@ -107,11 +107,13 @@ private fun ChatScreen(
             currentUserId = currentUserId,
             peerLastReadMillis = uiState.peerLastReadMillis,
             selecting = uiState.selecting,
+            reactionPendingIds = uiState.reactionPendingIds,
             selected = uiState.selected,
             isLoading = uiState.isLoading,
             onLoadOlder = onLoadOlder,
             onToggleSelected = onToggleSelected,
             onRetry = onRetry,
+            onReact = onReact,
             profileState = profileState,
             ensureProfile = ensureProfile,
             contentPadding = innerPadding,

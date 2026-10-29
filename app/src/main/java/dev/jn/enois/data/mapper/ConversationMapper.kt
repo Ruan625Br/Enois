@@ -8,6 +8,7 @@ import dev.jn.enois.domain.model.Conversation
 import dev.jn.enois.domain.model.ConversationKind
 import dev.jn.enois.domain.model.CursorPage
 import dev.jn.enois.domain.model.Message
+import dev.jn.enois.domain.model.ReactionType
 
 fun ConversationDto.toDomain() = Conversation(
     id = id,
@@ -32,11 +33,15 @@ fun MessageDto.toDomain() = Message(
     mediaSpoiler = mediaSpoiler,
     time = time,
     timeMillis = parseIsoMillis(time) ?: 0L,
-    reactions = reactions,
+    reactions = reactions.toDomain(),
     myReaction = myReaction,
     isE2e = e2e,
     iv = iv,
 )
+
+private fun Map<String, Int>.toDomain() =
+    mapNotNull { (key, count) -> ReactionType.fromKey(key)?.let { it to count } }
+        .toMap()
 
 @JvmName("conversationListToDomain")
 fun List<ConversationDto>.toDomain(): List<Conversation> =

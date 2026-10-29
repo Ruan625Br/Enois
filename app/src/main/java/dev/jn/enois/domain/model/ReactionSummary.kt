@@ -1,6 +1,9 @@
 package dev.jn.enois.domain.model
 
+import androidx.compose.runtime.Stable
 
+
+@Stable
 data class ReactionSummary(
     val counts: Map<ReactionType, Int> = emptyMap(),
 ) {
