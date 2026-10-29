@@ -16,18 +16,20 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberNavBackStack
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import dev.jn.enois.domain.model.SessionState
+import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.presentation.auth.login.LoginRoute
 import dev.jn.enois.presentation.auth.register.RegisterRoute
+import dev.jn.enois.presentation.components.richtext.ProvideEmotes
 import dev.jn.enois.presentation.feed.FeedRoute
-import dev.jn.enois.presentation.postdetails.PostDetailRoute
-import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.presentation.media.viewer.MediaViewerRoute
+import dev.jn.enois.presentation.postdetails.PostDetailRoute
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -35,8 +37,8 @@ fun MainNavigation(modifier: Modifier = Modifier) {
 
     val sessionViewModel: SessionViewModel = koinViewModel()
     val sessionState by sessionViewModel.state.collectAsState()
+    val emotes by sessionViewModel.emotes.collectAsStateWithLifecycle()
     val backStack = rememberNavBackStack(AppScreen.SplashScreen)
-
 
     LaunchedEffect(sessionState) {
         val destination = when (sessionState) {
@@ -62,81 +64,83 @@ fun MainNavigation(modifier: Modifier = Modifier) {
         modifier = modifier
     ) { innerPadding ->
         SharedTransitionLayout {
-            CompositionLocalProvider(
-                LocalSharedTransitionScope provides this
-            ) {
-                NavDisplay(
-                    modifier = Modifier.padding(innerPadding),
-                    backStack = backStack,
-                    onBack = {
-                        if (backStack.size > 1) {
-                            backStack.removeAt(backStack.lastIndex)
-                        }
-                    },
-                    popTransitionSpec = {
-                        EnterTransition.None togetherWith ExitTransition.None
-                    },
-                    predictivePopTransitionSpec = {
-                        EnterTransition.None togetherWith ExitTransition.None
-                    },
-                    entryDecorators = listOf(
-                        rememberSaveableStateHolderNavEntryDecorator(),
-                        rememberViewModelStoreNavEntryDecorator()
-                    ),
-                    entryProvider = entryProvider {
-                        entry<AppScreen.SplashScreen> {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator()
+            ProvideEmotes(emotes) {
+                CompositionLocalProvider(
+                    LocalSharedTransitionScope provides this
+                ) {
+                    NavDisplay(
+                        modifier = Modifier.padding(innerPadding),
+                        backStack = backStack,
+                        onBack = {
+                            if (backStack.size > 1) {
+                                backStack.removeAt(backStack.lastIndex)
+                            }
+                        },
+                        popTransitionSpec = {
+                            EnterTransition.None togetherWith ExitTransition.None
+                        },
+                        predictivePopTransitionSpec = {
+                            EnterTransition.None togetherWith ExitTransition.None
+                        },
+                        entryDecorators = listOf(
+                            rememberSaveableStateHolderNavEntryDecorator(),
+                            rememberViewModelStoreNavEntryDecorator()
+                        ),
+                        entryProvider = entryProvider {
+                            entry<AppScreen.SplashScreen> {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                            entry<AppScreen.LoginScreen> {
+                                LoginRoute(
+                                    onNavigateToRegister = {
+                                        backStack.add(AppScreen.RegisterScreen)
+                                    }
+                                )
+                            }
+                            entry<AppScreen.RegisterScreen> {
+                                RegisterRoute(
+                                    onNavigateToLogin = {
+                                        backStack.add(AppScreen.LoginScreen)
+                                    }
+                                )
+                            }
+                            entry<AppScreen.FeedScreen> {
+                                FeedRoute(
+                                    onNavigateToPostDetails = { postId ->
+                                        backStack.add(AppScreen.PostDetailsScreen(postId))
+                                    },
+                                    onNavigateToMediaViewer = { mediaId ->
+                                        backStack.add(AppScreen.MediaViewer(mediaId))
+                                    }
+                                )
+                            }
+
+                            entry<AppScreen.PostDetailsScreen> { key ->
+                                PostDetailRoute(
+                                    postId = key.postId,
+                                    onBack = {
+                                        backStack.removeLastOrNull()
+                                    },
+                                    onNavigateToMediaViewer = { mediaId ->
+                                        backStack.add(AppScreen.MediaViewer(mediaId))
+                                    }
+                                )
+                            }
+
+                            entry<AppScreen.MediaViewer> { key ->
+                                MediaViewerRoute(
+                                    mediaId = key.mediaId
+                                )
                             }
                         }
-                        entry<AppScreen.LoginScreen> {
-                            LoginRoute(
-                                onNavigateToRegister = {
-                                    backStack.add(AppScreen.RegisterScreen)
-                                }
-                            )
-                        }
-                        entry<AppScreen.RegisterScreen> {
-                            RegisterRoute(
-                                onNavigateToLogin = {
-                                    backStack.add(AppScreen.LoginScreen)
-                                }
-                            )
-                        }
-                        entry<AppScreen.FeedScreen> {
-                            FeedRoute(
-                                onNavigateToPostDetails = { postId ->
-                                    backStack.add(AppScreen.PostDetailsScreen(postId))
-                                },
-                                onNavigateToMediaViewer = { mediaId ->
-                                    backStack.add(AppScreen.MediaViewer(mediaId))
-                                }
-                            )
-                        }
-
-                        entry<AppScreen.PostDetailsScreen> { key ->
-                            PostDetailRoute(
-                                postId = key.postId,
-                                onBack = {
-                                    backStack.removeLastOrNull()
-                                },
-                                onNavigateToMediaViewer = { mediaId ->
-                                    backStack.add(AppScreen.MediaViewer(mediaId))
-                                }
-                            )
-                        }
-
-                        entry<AppScreen.MediaViewer> { key ->
-                            MediaViewerRoute(
-                                mediaId = key.mediaId
-                            )
-                        }
-                    }
-                )
+                    )
+                }
             }
         }
     }

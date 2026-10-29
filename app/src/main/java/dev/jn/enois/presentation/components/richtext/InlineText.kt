@@ -1,16 +1,22 @@
 package dev.jn.enois.presentation.components.richtext
 
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.text.InlineTextContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.TextStyle
@@ -23,12 +29,15 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.em
+import coil3.compose.AsyncImage
 import dev.jn.enois.domain.util.RichInline
 
+@Stable
 internal class RichCtx(
     val webOrigin: String,
     val mediaSpoiler: Boolean,
     val onMention: (String) -> Unit,
+    val emotes: Map<String, String> = emptyMap(),
 )
 
 private class InlineStyles(
@@ -39,6 +48,7 @@ private class InlineStyles(
     val spoilerShown: SpanStyle,
     val revealed: Set<Int>,
     val onReveal: (Int) -> Unit,
+    val usedEmotes: MutableSet<String>,
     val ctx: RichCtx,
 )
 
@@ -54,19 +64,14 @@ internal fun InlineText(
     val scheme = MaterialTheme.colorScheme
     var revealed by remember { mutableStateOf(emptySet<Int>()) }
 
-    val text = remember(inlines, revealed, scheme, ctx.webOrigin) {
+    val (text, inlineContent) = remember(inlines, revealed, scheme, ctx.webOrigin, ctx.emotes) {
+        val used = mutableSetOf<String>()
         val styles = InlineStyles(
             link = TextLinkStyles(
-                SpanStyle(
-                    color = scheme.primary,
-                    textDecoration = TextDecoration.Underline
-                )
+                SpanStyle(color = scheme.primary, textDecoration = TextDecoration.Underline)
             ),
             mention = TextLinkStyles(
-                SpanStyle(
-                    color = scheme.primary,
-                    fontWeight = FontWeight.Medium
-                )
+                SpanStyle(color = scheme.primary, fontWeight = FontWeight.Medium)
             ),
             code = SpanStyle(
                 fontFamily = FontFamily.Monospace,
@@ -79,17 +84,33 @@ internal fun InlineText(
             spoilerShown = SpanStyle(background = scheme.surfaceContainerHighest),
             revealed = revealed,
             onReveal = { revealed = revealed + it },
+            usedEmotes = used,
             ctx = ctx,
         )
-        buildAnnotatedString { appendInlines(inlines, styles, intArrayOf(0)) }
+        val annotated = buildAnnotatedString { appendInlines(inlines, styles, intArrayOf(0)) }
+
+        val content = used.associate { code ->
+            (EMOTE_PREFIX + code) to InlineTextContent(
+                Placeholder(1.6.em, 1.6.em, PlaceholderVerticalAlign.TextCenter)
+            ) {
+                AsyncImage(
+                    model = ctx.emotes.getValue(code),
+                    contentDescription = code,
+                    contentScale = ContentScale.Fit,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+        }
+        annotated to content
     }
 
     Text(
         text = text,
+        inlineContent = inlineContent,
         style = style,
         color = color,
         textAlign = textAlign,
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -100,7 +121,8 @@ private fun AnnotatedString.Builder.appendInlines(
 ) {
     nodes.forEach { node ->
         when (node) {
-            is RichInline.Text -> append(node.value)
+            is RichInline.Text -> appendWithEmotes(node.value, s.ctx.emotes, s.usedEmotes)
+
             is RichInline.Bold -> withStyle(SpanStyle(fontWeight = FontWeight.Medium)) {
                 appendInlines(node.children, s, spoilerCounter)
             }
@@ -117,9 +139,7 @@ private fun AnnotatedString.Builder.appendInlines(
 
             is RichInline.Mention -> withLink(
                 LinkAnnotation.Clickable("mention:${node.username}", s.mention) {
-                    s.ctx.onMention(
-                        node.username
-                    )
+                    s.ctx.onMention(node.username)
                 }
             ) { append("@${node.username}") }
 
@@ -129,12 +149,12 @@ private fun AnnotatedString.Builder.appendInlines(
                     withStyle(s.spoilerShown) { append(node.value) }
                 } else {
                     withLink(
-                        LinkAnnotation.Clickable(
-                            "spoiler:$index",
-                            s.spoilerHidden
-                        ) { s.onReveal(index) }) {
-                        append(node.value)
-                    }
+                        LinkAnnotation.Clickable("spoiler:$index", s.spoilerHidden) {
+                            s.onReveal(
+                                index
+                            )
+                        }
+                    ) { append(node.value) }
                 }
             }
 
@@ -142,11 +162,7 @@ private fun AnnotatedString.Builder.appendInlines(
                 val href = safeHref(node.href, s.ctx.webOrigin)
                 if (href == null) appendInlines(node.children, s, spoilerCounter)
                 else withLink(LinkAnnotation.Url(href, s.link)) {
-                    appendInlines(
-                        node.children,
-                        s,
-                        spoilerCounter
-                    )
+                    appendInlines(node.children, s, spoilerCounter)
                 }
             }
 

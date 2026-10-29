@@ -5,6 +5,7 @@ import dev.jn.enois.data.local.session.PersistentCookiesStorage
 import dev.jn.enois.data.local.session.SecureCookieStore
 import dev.jn.enois.data.remote.api.AuthApi
 import dev.jn.enois.data.remote.api.CommentApi
+import dev.jn.enois.data.remote.api.EmoteApi
 import dev.jn.enois.data.remote.api.FeedApi
 import dev.jn.enois.data.remote.api.MediaApi
 import dev.jn.enois.data.remote.api.ReactionApi
@@ -120,4 +121,5 @@ val networkModule = module {
     singleOf(::MediaApi)
     singleOf(::ReactionApi)
     singleOf(::CommentApi)
+    singleOf(::EmoteApi)
 }
