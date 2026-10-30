@@ -91,5 +91,10 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.coil.gif)
     implementation(libs.coil.svg)
+
+    implementation(libs.haze.core)
+    implementation(libs.haze.blur)
+    implementation(libs.haze.materials)
+    implementation(libs.haze.glass)
 }
 

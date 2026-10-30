@@ -26,7 +26,10 @@ import dev.jn.enois.ui.icons.AppIcons
 fun FeedToolbar(
     userProfile: UserProfile?,
     onConversationClick: () -> Unit,
-    modifier: Modifier = Modifier) {
+    onAccountMenuChange: (Boolean) -> Unit,
+    modifier: Modifier = Modifier
+) {
+
     Box(
         modifier = modifier
             .toolbarSharedBounds(
@@ -52,12 +55,13 @@ fun FeedToolbar(
 
             FeedToolbarActions(
                 userProfile = userProfile,
-                onConversationClick = onConversationClick
+                onConversationClick = onConversationClick,
+                onAccountMenuChange = onAccountMenuChange
             )
         }
-
-
     }
+
+
 }
 
 @Composable

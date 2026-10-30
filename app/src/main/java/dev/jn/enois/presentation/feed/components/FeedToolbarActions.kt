@@ -18,7 +18,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -27,13 +29,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import dev.jn.enois.domain.model.UserProfile
+import dev.jn.enois.domain.model.asAccountMenuProfile
 import dev.jn.enois.presentation.components.avatar.UserAvatar
+import dev.jn.enois.presentation.profile.components.AccountMenu
 import dev.jn.enois.ui.icons.AppIcons
 
 @Composable
 fun FeedToolbarActions(
     userProfile: UserProfile?,
     onConversationClick: () -> Unit,
+    onAccountMenuChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val buttonShape = RoundedCornerShape(50)
@@ -52,52 +57,72 @@ fun FeedToolbarActions(
         label = "top_pill_width"
     )
 
-    Surface(
-        shape = buttonShape,
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        border = border,
-        modifier = modifier
-            .size(width = pillWidth, height = topPillSize)
-            .clip(buttonShape)
-    ) {
-        Box(
-            modifier = Modifier.fillMaxWidth()
+    var showAccountMenu by remember { mutableStateOf(false) }
+
+
+    Box {
+        Surface(
+            shape = buttonShape,
+            color = MaterialTheme.colorScheme.surfaceContainer,
+            border = border,
+            modifier = modifier
+                .size(width = pillWidth, height = topPillSize)
+                .clip(buttonShape)
         ) {
-
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterStart)
-                    .size(width = fullPillWidth, height = topPillSize)
-                    .graphicsLayer {
-                        this.alpha = alpha
-                        val layerScale = 0.92f + alpha * 0.08f
-                        scaleX = layerScale
-                        scaleY = layerScale
-                    },
-                verticalAlignment = Alignment.CenterVertically
+            Box(
+                modifier = Modifier.fillMaxWidth()
             ) {
-                FeedToolbarIconButton(
-                    icon = AppIcons.Notifications,
-                    size = topPillSize,
-                    onClick = {}
-                )
 
-                FeedToolbarIconButton(
-                    icon = AppIcons.Inbox,
-                    size = topPillSize,
-                    onClick = onConversationClick
-                )
-
-                if (userProfile != null) {
-                    UserProfileIcon(
-                        url = userProfile.avatar ?: "",
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.CenterStart)
+                        .size(width = fullPillWidth, height = topPillSize)
+                        .graphicsLayer {
+                            this.alpha = alpha
+                            val layerScale = 0.92f + alpha * 0.08f
+                            scaleX = layerScale
+                            scaleY = layerScale
+                        },
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    FeedToolbarIconButton(
+                        icon = AppIcons.Notifications,
                         size = topPillSize,
-                        name = userProfile.name,
                         onClick = {}
                     )
+
+                    FeedToolbarIconButton(
+                        icon = AppIcons.Inbox,
+                        size = topPillSize,
+                        onClick = onConversationClick
+                    )
+
+                    if (userProfile != null) {
+                        Box {
+                            UserProfileIcon(
+                                url = userProfile.avatar ?: "",
+                                size = topPillSize,
+                                name = userProfile.name,
+                                onClick = {
+                                    showAccountMenu = !showAccountMenu
+                                    onAccountMenuChange(showAccountMenu)
+                                }
+                            )
+
+                            AccountMenu(
+                                visible = showAccountMenu,
+                                onDismiss = {
+                                    showAccountMenu = false
+                                    onAccountMenuChange(false)
+                                },
+                                profile = userProfile.asAccountMenuProfile()
+                            )
+                        }
+                    }
                 }
             }
         }
+
     }
 }
 
