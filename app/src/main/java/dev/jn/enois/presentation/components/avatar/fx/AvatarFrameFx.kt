@@ -1,7 +1,10 @@
 package dev.jn.enois.presentation.components.avatar.fx
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
@@ -9,7 +12,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.text.rememberTextMeasurer
+import coil3.compose.LocalPlatformContext
 import dev.jn.enois.domain.model.AvatarFrameType
+import dev.jn.enois.presentation.components.avatar.fx.seasonal.SeasonalCtx
+import dev.jn.enois.presentation.components.avatar.fx.seasonal.SeasonalIcons
+import dev.jn.enois.presentation.components.avatar.fx.seasonal.drawSeasonal
+import dev.jn.enois.presentation.components.avatar.fx.seasonal.seasonalIconKeys
 
 
 @Composable
@@ -17,6 +26,17 @@ fun AvatarFrameFx(frame: AvatarFrameType, modifier: Modifier = Modifier) {
     val clock = LocalAvatarFxClock.current ?: rememberFreeRunningClock()
     val still = false
     val galaxia = if (frame == AvatarFrameType.GALAXIA) rememberGalaxiaImages() else null
+
+    val primary = MaterialTheme.colorScheme.primary
+    val seasonal = if (frame.isSeasonal) {
+        val measurer = rememberTextMeasurer()
+        remember(measurer) { SeasonalCtx(measurer) }
+    } else null
+
+    if (frame.isSeasonal) {
+        val context = LocalPlatformContext.current
+        LaunchedEffect(frame) { SeasonalIcons.load(context, seasonalIconKeys(frame.fxName)) }
+    }
 
 
     Canvas(modifier) {
@@ -41,6 +61,13 @@ fun AvatarFrameFx(frame: AvatarFrameType, modifier: Modifier = Modifier) {
                 AvatarFrameType.SUPERNOVA -> drawSupernova(t, still)
                 AvatarFrameType.PORTAL -> drawPortal(t, still)
                 AvatarFrameType.GALAXIA -> galaxia?.let { drawGalaxia(t, it, still) }
+                else -> seasonal?.let {
+                    it.t = t
+                    it.still = still
+                    it.primary = primary
+                    it.alpha = 1f
+                    drawSeasonal(frame.fxName, it)
+                }
             }
         }
     }
