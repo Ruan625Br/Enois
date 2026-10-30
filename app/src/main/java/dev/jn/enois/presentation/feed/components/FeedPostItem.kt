@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.HorizontalDivider
@@ -18,7 +19,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import dev.jn.enois.core.util.formatTime
@@ -28,6 +28,7 @@ import dev.jn.enois.presentation.animation.LocalSharedTransitionScope
 import dev.jn.enois.presentation.components.avatar.UserAvatar
 import dev.jn.enois.presentation.components.badge.UserBadges
 import dev.jn.enois.presentation.components.richtext.CollapsibleRichText
+import dev.jn.enois.presentation.components.styledname.StyledName
 import dev.jn.enois.presentation.media.MediaUiState
 import dev.jn.enois.presentation.reactions.PostReactionsState
 import dev.jn.enois.presentation.reactions.ReactionAction
@@ -179,17 +180,15 @@ private fun PostHeader(
 
         Row(
             modifier = Modifier
-                .fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically,
+                .fillMaxWidth()
+                .heightIn(max = 48.dp),
+            verticalAlignment = Alignment.Top,
             horizontalArrangement = Arrangement.spacedBy(5.dp)
         ) {
             Column {
-                Text(
-                    text = post.authorName,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface
+                StyledName(
+                    name = post.authorName,
+                    style = post.authorStyle
                 )
 
                 UserBadges(badges = badges)
