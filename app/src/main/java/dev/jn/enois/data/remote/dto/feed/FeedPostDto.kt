@@ -1,5 +1,6 @@
 package dev.jn.enois.data.remote.dto.feed
 
+import dev.jn.enois.data.remote.dto.profile.AuthorNameStyleDto
 import dev.jn.enois.data.remote.dto.reaction.ReactionSummaryDto
 import dev.jn.enois.domain.model.AuthorIdentity
 import dev.jn.enois.domain.model.PostStatus
@@ -15,6 +16,7 @@ data class FeedPostDto(
     val authorUsername: String,
     val authorName: String,
     val authorBadge: String?,
+    val authorStyle: AuthorNameStyleDto? = null,
     val authorBadges: List<String>?,
     val authorAvatar: String?,
     val authorAvatarFrame: String?,

@@ -9,6 +9,7 @@ data class FeedPost(
     val authorUsername: String,
     val authorName: String,
     val authorBadge: String?,
+    val authorStyle: AuthorNameStyle?,
     val authorBadges: List<String>?,
     val authorAvatar: String?,
     val authorAvatarFrame: AvatarFrameType?,
