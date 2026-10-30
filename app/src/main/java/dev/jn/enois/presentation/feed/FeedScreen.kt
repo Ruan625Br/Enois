@@ -1,12 +1,15 @@
 package dev.jn.enois.presentation.feed
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -21,6 +24,12 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import dev.chrisbanes.haze.ExperimentalHazeApi
+import dev.chrisbanes.haze.HazeInput
+import dev.chrisbanes.haze.blur.hazeBlur
+import dev.chrisbanes.haze.blur.materials.HazeMaterials
+import dev.chrisbanes.haze.hazeSource
+import dev.chrisbanes.haze.rememberHazeState
 import dev.jn.enois.domain.model.FeedPost
 import dev.jn.enois.domain.model.ReactionSummary
 import dev.jn.enois.domain.model.ReactionType
@@ -70,6 +79,7 @@ fun FeedRoute(
     )
 }
 
+@OptIn(ExperimentalHazeApi::class)
 @Composable
 private fun FeedScreen(
     feedUiState: FeedUiState,
@@ -108,6 +118,8 @@ private fun FeedScreen(
     val navScope = LocalNavAnimatedContentScope.current
     val transitionRunning = navScope.transition.currentState != navScope.transition.targetState
 
+    var showAccountMenu by remember { mutableStateOf(false) }
+    val hazeState = rememberHazeState()
 
     ProvideAvatarFxClock(
         paused = { listState.isScrollInProgress || transitionRunning }
@@ -126,24 +138,45 @@ private fun FeedScreen(
                 ) {
                     FeedToolbar(
                         userProfile = feedUiState.userProfile,
-                        onConversationClick = onNavigateToConversations
+                        onConversationClick = onNavigateToConversations,
+                        onAccountMenuChange = {
+                            showAccountMenu = it
+                        }
                     )
                 }
             },
         ) { innerPadding ->
+            Box(
+                modifier = Modifier
+                    .hazeSource(hazeState),
+            ) {
+                FeedScreenContent(
+                    posts = posts,
+                    listState = listState,
+                    innerPadding = innerPadding,
+                    mediaUiState = mediaUiState,
+                    reactionStates = reactionStates,
+                    onReactionAction = onReactionAction,
+                    onLoadMedia = onLoadMedia,
+                    onProvideReactionSummary = onProvideReactionSummary,
+                    onNavigateToPostDetails = onNavigateToPostDetails,
+                    onNavigateToMediaViewer = onNavigateToMediaViewer
+                )
+            }
 
-            FeedScreenContent(
-                posts = posts,
-                listState = listState,
-                innerPadding = innerPadding,
-                mediaUiState = mediaUiState,
-                reactionStates = reactionStates,
-                onReactionAction = onReactionAction,
-                onLoadMedia = onLoadMedia,
-                onProvideReactionSummary = onProvideReactionSummary,
-                onNavigateToPostDetails = onNavigateToPostDetails,
-                onNavigateToMediaViewer = onNavigateToMediaViewer
-            )
+            AnimatedVisibility(
+                visible = showAccountMenu,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .hazeBlur(
+                            input = HazeInput.Sources(hazeState),
+                            style = HazeMaterials.thin()
+                        )
+
+                )
+            }
         }
     }
 }
